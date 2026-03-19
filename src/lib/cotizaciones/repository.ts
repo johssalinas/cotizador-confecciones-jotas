@@ -45,7 +45,7 @@ export async function listCotizaciones(
 ): Promise<CotizacionListItem[]> {
   const { data, error } = await supabase
     .from(TABLE_NAME)
-    .select('id, numero, cliente, fecha, total, pdf_url')
+    .select('id, numero, cliente, fecha, total, productos')
     .order('numero', { ascending: false })
     .limit(limit);
 
@@ -53,14 +53,20 @@ export async function listCotizaciones(
     throw new Error(`No fue posible listar cotizaciones: ${error.message}`);
   }
 
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    numero: Number(row.numero),
-    cliente: row.cliente,
-    fecha: row.fecha,
-    total: Number(row.total),
-    pdfUrl: row.pdf_url,
-  }));
+  return (data ?? []).map((row) => {
+    const parsedProductos = productoSchema.array().safeParse(row.productos);
+
+    return {
+      id: row.id,
+      numero: Number(row.numero),
+      cliente: row.cliente,
+      descripcionesProductos: parsedProductos.success
+        ? parsedProductos.data.map((producto) => producto.descripcion)
+        : [],
+      fecha: row.fecha,
+      total: Number(row.total),
+    };
+  });
 }
 
 export async function getCotizacionById(

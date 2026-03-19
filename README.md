@@ -15,15 +15,13 @@ Aplicacion web minimalista y rapida para generar y administrar cotizaciones en u
 ## Funcionalidades incluidas
 
 - Inicio con listado de cotizaciones guardadas
-- Vista previa miniatura por cotizacion
 - Crear nueva cotizacion
 - Editar cotizacion existente
 - Duplicar cotizacion
 - Eliminar cotizacion
 - Ver PDF en navegador
 - Descargar PDF
-- Preview de PDF en tiempo real antes de guardar
-- Numero de cotizacion autoincrementable generado en DB
+- Número de cotizacion autoincrementable generado en DB
 
 ## Estructura principal
 
@@ -89,7 +87,6 @@ npm run dev
 ```bash
 npm run check
 npm run build
-npm run preview
 ```
 
 ## Despliegue en Vercel (recomendado)

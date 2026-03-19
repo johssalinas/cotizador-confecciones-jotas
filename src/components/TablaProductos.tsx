@@ -1,8 +1,7 @@
 import { Plus, Trash2 } from 'lucide-solid';
-import { Index, createMemo } from 'solid-js';
+import { For, createMemo, type Setter } from 'solid-js';
 
 import { Button } from '@/components/ui/button';
-import { TextField, TextFieldRoot } from '@/components/ui/textfield';
 import {
   Table,
   TableBody,
@@ -17,11 +16,13 @@ import {
   formatMonedaCop,
 } from '@/lib/cotizaciones/calculations';
 import type { ProductoInput } from '@/lib/cotizaciones/types';
+import { cn } from '@/lib/utils';
 
 interface TablaProductosProps {
   productos: ProductoInput[];
-  onChange: (next: ProductoInput[]) => void;
+  onChange: Setter<ProductoInput[]>;
   disabled?: boolean;
+  showValidationErrors?: boolean;
 }
 
 function createBlankRow(): ProductoInput {
@@ -33,6 +34,11 @@ function createBlankRow(): ProductoInput {
 }
 
 export function TablaProductos(props: TablaProductosProps) {
+  const shouldShowErrors = () => props.showValidationErrors ?? false;
+
+  const inputBaseClass =
+    'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-shadow placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50';
+
   const rowErrors = createMemo(() => {
     return props.productos.map((producto) => ({
       descripcion:
@@ -43,18 +49,22 @@ export function TablaProductos(props: TablaProductosProps) {
   });
 
   const updateRow = (index: number, patch: Partial<ProductoInput>) => {
-    const next = [...props.productos];
-    next[index] = { ...next[index], ...patch };
-    props.onChange(next);
+    props.onChange((current) =>
+      current.map((producto, rowIndex) =>
+        rowIndex === index ? { ...producto, ...patch } : producto,
+      )
+    );
   };
 
   const addRow = () => {
-    props.onChange([...props.productos, createBlankRow()]);
+    props.onChange((current) => [...current, createBlankRow()]);
   };
 
   const removeRow = (index: number) => {
-    const next = props.productos.filter((_, rowIndex) => rowIndex !== index);
-    props.onChange(next.length > 0 ? next : [createBlankRow()]);
+    props.onChange((current) => {
+      const next = current.filter((_, rowIndex) => rowIndex !== index);
+      return next.length > 0 ? next : [createBlankRow()];
+    });
   };
 
   const totalGeneral = createMemo(() => formatMonedaCop(calcularTotal(props.productos)));
@@ -65,109 +75,113 @@ export function TablaProductos(props: TablaProductosProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead class="text-xs uppercase tracking-[0.08em]">Descripcion del Producto</TableHead>
-              <TableHead class="text-xs uppercase tracking-[0.08em]">Cantidad</TableHead>
-              <TableHead class="text-xs uppercase tracking-[0.08em]">Precio Unitario</TableHead>
-              <TableHead class="text-xs uppercase tracking-[0.08em]">Total</TableHead>
+              <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">Descripcion del Producto</TableHead>
+              <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">Cantidad</TableHead>
+              <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">Precio Unitario</TableHead>
+              <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">SubTotal</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
-            <Index each={props.productos}>
+            <For each={props.productos}>
               {(producto, rowIndex) => (
                 <TableRow>
                   <TableCell>
-                    <TextFieldRoot>
-                      <TextField
-                        value={producto().descripcion}
+                    <div class="space-y-1">
+                      <input
+                        value={producto.descripcion}
                         placeholder="Ej. Uniforme en tela Lafayette"
-                        class={
-                          rowErrors()[rowIndex]?.descripcion
+                        class={cn(
+                          inputBaseClass,
+                          shouldShowErrors() && rowErrors()[rowIndex()]?.descripcion
                             ? 'border-destructive focus-visible:ring-destructive/70'
-                            : 'bg-background/80'
-                        }
+                            : 'bg-background/80',
+                        )}
                         disabled={props.disabled}
                         onInput={(event) => {
-                          updateRow(rowIndex, {
+                          updateRow(rowIndex(), {
                             descripcion: event.currentTarget.value,
                           });
                         }}
                       />
-                      {rowErrors()[rowIndex]?.descripcion && (
+                      {shouldShowErrors() && rowErrors()[rowIndex()]?.descripcion && (
                         <p class="text-xs text-destructive">
-                          {rowErrors()[rowIndex]?.descripcion}
+                          {rowErrors()[rowIndex()]?.descripcion}
                         </p>
                       )}
-                    </TextFieldRoot>
+                    </div>
                   </TableCell>
 
                   <TableCell>
-                    <TextFieldRoot>
-                      <TextField
+                    <div class="space-y-1">
+                      <input
                         type="number"
                         min={1}
-                        value={String(producto().cantidad)}
-                        class={
-                          rowErrors()[rowIndex]?.cantidad
+                        value={String(producto.cantidad)}
+                        class={cn(
+                          inputBaseClass,
+                          shouldShowErrors() && rowErrors()[rowIndex()]?.cantidad
                             ? 'border-destructive focus-visible:ring-destructive/70'
-                            : 'bg-background/80'
-                        }
+                            : 'bg-background/80',
+                        )}
                         disabled={props.disabled}
                         onInput={(event) => {
                           const next = Number(event.currentTarget.value);
-                          updateRow(rowIndex, {
+                          updateRow(rowIndex(), {
                             cantidad: Number.isNaN(next) ? 0 : next,
                           });
                         }}
                       />
-                      {rowErrors()[rowIndex]?.cantidad && (
+                      {shouldShowErrors() && rowErrors()[rowIndex()]?.cantidad && (
                         <p class="text-xs text-destructive">
-                          {rowErrors()[rowIndex]?.cantidad}
+                          {rowErrors()[rowIndex()]?.cantidad}
                         </p>
                       )}
-                    </TextFieldRoot>
+                    </div>
                   </TableCell>
 
                   <TableCell>
-                    <TextFieldRoot>
-                      <TextField
+                    <div class="space-y-1">
+                      <input
                         type="number"
                         min={0}
                         step="100"
-                        value={String(producto().precioUnitario)}
-                        class={
-                          rowErrors()[rowIndex]?.precioUnitario
+                        value={String(producto.precioUnitario)}
+                        class={cn(
+                          inputBaseClass,
+                          shouldShowErrors() && rowErrors()[rowIndex()]?.precioUnitario
                             ? 'border-destructive focus-visible:ring-destructive/70'
-                            : 'bg-background/80'
-                        }
+                            : 'bg-background/80',
+                        )}
                         disabled={props.disabled}
                         onInput={(event) => {
                           const next = Number(event.currentTarget.value);
-                          updateRow(rowIndex, {
+                          updateRow(rowIndex(), {
                             precioUnitario: Number.isNaN(next) ? 0 : next,
                           });
                         }}
                       />
-                      {rowErrors()[rowIndex]?.precioUnitario && (
+                      {shouldShowErrors() && rowErrors()[rowIndex()]?.precioUnitario && (
                         <p class="text-xs text-destructive">
-                          {rowErrors()[rowIndex]?.precioUnitario}
+                          {rowErrors()[rowIndex()]?.precioUnitario}
                         </p>
                       )}
-                    </TextFieldRoot>
+                    </div>
                   </TableCell>
 
                   <TableCell>
                     <p class="font-semibold text-foreground">
-                      {formatMonedaCop(calcularSubtotal(producto()))}
+                      {formatMonedaCop(calcularSubtotal(producto))}
                     </p>
                   </TableCell>
 
                   <TableCell>
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       disabled={props.disabled}
-                      onClick={() => removeRow(rowIndex)}
+                      onClick={() => removeRow(rowIndex())}
                       aria-label="Eliminar producto"
                     >
                       <Trash2 class="h-4 w-4" />
@@ -175,7 +189,7 @@ export function TablaProductos(props: TablaProductosProps) {
                   </TableCell>
                 </TableRow>
               )}
-            </Index>
+            </For>
             <TableRow>
               <TableCell class="font-semibold" colSpan={3}>
                 Total General
@@ -187,7 +201,13 @@ export function TablaProductos(props: TablaProductosProps) {
         </Table>
       </div>
 
-      <Button variant="secondary" onClick={addRow} disabled={props.disabled}>
+      <Button
+        type="button"
+        variant="secondary"
+        class="cursor-pointer"
+        onClick={addRow}
+        disabled={props.disabled}
+      >
         <Plus class="h-4 w-4" />
         Agregar producto
       </Button>

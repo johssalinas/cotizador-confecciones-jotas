@@ -1,9 +1,9 @@
 import { createForm } from '@tanstack/solid-form';
-import { LoaderCircle, Save } from 'lucide-solid';
+import { ArrowLeft, LoaderCircle, Save } from 'lucide-solid';
 import { Show, createMemo, createSignal } from 'solid-js';
 
 import { TablaProductos } from '@/components/TablaProductos';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -17,8 +17,6 @@ import {
   TextFieldRoot,
 } from '@/components/ui/textfield';
 import {
-  calcularTotal,
-  formatMonedaCop,
   formatNumeroCotizacion,
 } from '@/lib/cotizaciones/calculations';
 import {
@@ -26,6 +24,7 @@ import {
   type CotizacionRecord,
   type ProductoInput,
 } from '@/lib/cotizaciones/types';
+import { cn } from '@/lib/utils';
 
 interface FormularioCotizacionProps {
   mode: 'create' | 'edit';
@@ -77,6 +76,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
 
   const [productos, setProductos] = createSignal<ProductoInput[]>(initialProductos);
   const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
+  const [showValidationErrors, setShowValidationErrors] = createSignal(false);
   const [savedCotizacion, setSavedCotizacion] = createSignal<CotizacionRecord | null>(
     props.initialCotizacion ?? null,
   );
@@ -144,7 +144,6 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
 
   const isSubmitting = form.useStore((state) => state.isSubmitting);
 
-  const total = createMemo(() => formatMonedaCop(calcularTotal(productos())));
   const cotizacionActual = createMemo(
     () => savedCotizacion() ?? props.initialCotizacion ?? null,
   );
@@ -159,12 +158,22 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
     <div class="mx-auto w-full max-w-5xl">
       <Card class="overflow-hidden border-border/80 bg-card/90 shadow-lg backdrop-blur">
         <CardHeader class="border-b border-border/70 bg-gradient-to-r from-[hsl(var(--accent)/0.55)] to-transparent">
+          <a
+            href="/"
+            class={cn(
+              buttonVariants({ variant: 'outline', size: 'sm' }),
+              'mb-4 w-fit gap-2 border-primary/35 bg-primary/10 text-primary hover:bg-primary/20',
+            )}
+          >
+            <ArrowLeft class="h-4 w-4" />
+            Volver al inicio
+          </a>
           <CardTitle class="text-2xl tracking-wide text-foreground">
-            {props.mode === 'create' ? 'Nueva Cotizacion' : 'Editar Cotizacion'}
+            {props.mode === 'create' ? 'Nueva Cotización' : 'Editar Cotización'}
           </CardTitle>
           <CardDescription class="leading-relaxed">
             {numeroVisible()
-              ? `Numero asignado: ${formatNumeroCotizacion(numeroVisible() ?? 0)}`
+              ? `Número asignado: ${formatNumeroCotizacion(numeroVisible() ?? 0)}`
               : 'El numero se asigna automaticamente al guardar.'}
             {' '}
             El PDF se genera unicamente al guardar la cotizacion.
@@ -175,10 +184,11 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
             class="space-y-7"
             onSubmit={async (event) => {
               event.preventDefault();
+              setShowValidationErrors(true);
               await form.handleSubmit();
             }}
           >
-            <div class="grid gap-4 sm:grid-cols-2">
+            <div class="mt-3 grid gap-4 sm:grid-cols-2">
               <form.Field name="cliente">
                 {(field) => (
                   <TextFieldRoot>
@@ -186,7 +196,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                     <TextField
                       id="cliente"
                       value={field().state.value}
-                      placeholder="Ej. Sofia Hernandez"
+                      placeholder="Ej. IT Comunicaciones"
                       class="h-10 bg-background/80 text-base"
                       onInput={(event) => field().handleChange(event.currentTarget.value)}
                       onBlur={field().handleBlur}
@@ -218,12 +228,8 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                 productos={productos()}
                 onChange={setProductos}
                 disabled={isSubmitting()}
+                showValidationErrors={showValidationErrors()}
               />
-            </div>
-
-            <div class="rounded-md border border-border bg-muted/40 px-4 py-3 shadow-sm">
-              <p class="text-sm text-muted-foreground">Total General</p>
-              <p class="text-2xl font-semibold text-foreground">{total()}</p>
             </div>
 
             <Show when={errorMessage()}>
@@ -239,7 +245,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                 <Show when={isSubmitting()} fallback={<Save class="h-4 w-4" />}>
                   <LoaderCircle class="h-4 w-4 animate-spin" />
                 </Show>
-                Guardar Cotizacion
+                Guardar Cotización
               </Button>
 
               <Show when={cotizacionId()}>
@@ -262,10 +268,6 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                   </>
                 )}
               </Show>
-
-              <a href="/" class="text-sm text-muted-foreground underline underline-offset-4">
-                Volver al inicio
-              </a>
             </div>
           </form>
         </CardContent>

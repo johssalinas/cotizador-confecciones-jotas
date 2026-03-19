@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ params }) => {
     const cotizacion = await getCotizacionById(supabase, id);
 
     if (!cotizacion) {
-      return jsonResponse({ error: 'Cotizacion no encontrada.' }, { status: 404 });
+      return jsonResponse({ error: 'Cotización no encontrada.' }, { status: 404 });
     }
 
     return jsonResponse({ data: cotizacion }, { status: 200 });
@@ -69,7 +69,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const previous = await getCotizacionById(supabase, id);
 
     if (!previous) {
-      return jsonResponse({ error: 'Cotizacion no encontrada.' }, { status: 404 });
+      return jsonResponse({ error: 'Cotización no encontrada.' }, { status: 404 });
     }
 
     const updated = await updateCotizacionData(supabase, id, parsed.data);
@@ -114,7 +114,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     const existing = await getCotizacionById(supabase, id);
 
     if (!existing) {
-      return jsonResponse({ error: 'Cotizacion no encontrada.' }, { status: 404 });
+      return jsonResponse({ error: 'Cotización no encontrada.' }, { status: 404 });
     }
 
     await deleteCotizacion(supabase, id);

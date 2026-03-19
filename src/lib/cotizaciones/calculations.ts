@@ -17,7 +17,13 @@ function parseDateValue(value: string): Date | null {
 }
 
 export function calcularSubtotal(producto: ProductoInput): number {
-  return roundMoneda(producto.cantidad * producto.precioUnitario);
+  const cantidad = Number(producto.cantidad);
+  const precioUnitario = Number(producto.precioUnitario);
+
+  return roundMoneda(
+    (Number.isFinite(cantidad) ? cantidad : 0) *
+      (Number.isFinite(precioUnitario) ? precioUnitario : 0),
+  );
 }
 
 export function calcularTotal(productos: ProductoInput[]): number {

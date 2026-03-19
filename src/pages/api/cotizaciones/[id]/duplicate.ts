@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ params }) => {
     const source = await getCotizacionById(supabase, id);
 
     if (!source) {
-      return jsonResponse({ error: 'Cotizacion no encontrada.' }, { status: 404 });
+      return jsonResponse({ error: 'Cotización no encontrada.' }, { status: 404 });
     }
 
     const duplicate = await createCotizacionDraft(supabase, {

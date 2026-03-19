@@ -17,7 +17,7 @@ export const GET: APIRoute = async ({ params, url }) => {
     const cotizacion = await getCotizacionById(supabase, id);
 
     if (!cotizacion || !cotizacion.pdfUrl) {
-      return new Response('Cotizacion no encontrada.', { status: 404 });
+      return new Response('Cotización no encontrada.', { status: 404 });
     }
 
     const bytes = await downloadPdfByPublicUrl(supabase, cotizacion.pdfUrl);

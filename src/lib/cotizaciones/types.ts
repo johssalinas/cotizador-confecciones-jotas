@@ -31,9 +31,9 @@ export interface CotizacionListItem {
   id: string;
   numero: number;
   cliente: string;
+  descripcionesProductos: string[];
   fecha: string;
   total: number;
-  pdfUrl: string;
 }
 
 export interface CotizacionApiError {
