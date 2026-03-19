@@ -1,5 +1,5 @@
 import { Plus, Trash2 } from 'lucide-solid';
-import { For, createMemo, type Setter } from 'solid-js';
+import { Index, createMemo, type Setter } from 'solid-js';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -83,30 +83,30 @@ export function TablaProductos(props: TablaProductosProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <For each={props.productos}>
+            <Index each={props.productos}>
               {(producto, rowIndex) => (
                 <TableRow>
                   <TableCell>
                     <div class="space-y-1">
                       <input
-                        value={producto.descripcion}
+                        value={producto().descripcion}
                         placeholder="Ej. Uniforme en tela Lafayette"
                         class={cn(
                           inputBaseClass,
-                          shouldShowErrors() && rowErrors()[rowIndex()]?.descripcion
+                          shouldShowErrors() && rowErrors()[rowIndex]?.descripcion
                             ? 'border-destructive focus-visible:ring-destructive/70'
                             : 'bg-background/80',
                         )}
                         disabled={props.disabled}
                         onInput={(event) => {
-                          updateRow(rowIndex(), {
+                          updateRow(rowIndex, {
                             descripcion: event.currentTarget.value,
                           });
                         }}
                       />
-                      {shouldShowErrors() && rowErrors()[rowIndex()]?.descripcion && (
+                      {shouldShowErrors() && rowErrors()[rowIndex]?.descripcion && (
                         <p class="text-xs text-destructive">
-                          {rowErrors()[rowIndex()]?.descripcion}
+                          {rowErrors()[rowIndex]?.descripcion}
                         </p>
                       )}
                     </div>
@@ -117,24 +117,24 @@ export function TablaProductos(props: TablaProductosProps) {
                       <input
                         type="number"
                         min={1}
-                        value={String(producto.cantidad)}
+                        value={String(producto().cantidad)}
                         class={cn(
                           inputBaseClass,
-                          shouldShowErrors() && rowErrors()[rowIndex()]?.cantidad
+                          shouldShowErrors() && rowErrors()[rowIndex]?.cantidad
                             ? 'border-destructive focus-visible:ring-destructive/70'
                             : 'bg-background/80',
                         )}
                         disabled={props.disabled}
                         onInput={(event) => {
                           const next = Number(event.currentTarget.value);
-                          updateRow(rowIndex(), {
+                          updateRow(rowIndex, {
                             cantidad: Number.isNaN(next) ? 0 : next,
                           });
                         }}
                       />
-                      {shouldShowErrors() && rowErrors()[rowIndex()]?.cantidad && (
+                      {shouldShowErrors() && rowErrors()[rowIndex]?.cantidad && (
                         <p class="text-xs text-destructive">
-                          {rowErrors()[rowIndex()]?.cantidad}
+                          {rowErrors()[rowIndex]?.cantidad}
                         </p>
                       )}
                     </div>
@@ -146,24 +146,24 @@ export function TablaProductos(props: TablaProductosProps) {
                         type="number"
                         min={0}
                         step="100"
-                        value={String(producto.precioUnitario)}
+                        value={String(producto().precioUnitario)}
                         class={cn(
                           inputBaseClass,
-                          shouldShowErrors() && rowErrors()[rowIndex()]?.precioUnitario
+                          shouldShowErrors() && rowErrors()[rowIndex]?.precioUnitario
                             ? 'border-destructive focus-visible:ring-destructive/70'
                             : 'bg-background/80',
                         )}
                         disabled={props.disabled}
                         onInput={(event) => {
                           const next = Number(event.currentTarget.value);
-                          updateRow(rowIndex(), {
+                          updateRow(rowIndex, {
                             precioUnitario: Number.isNaN(next) ? 0 : next,
                           });
                         }}
                       />
-                      {shouldShowErrors() && rowErrors()[rowIndex()]?.precioUnitario && (
+                      {shouldShowErrors() && rowErrors()[rowIndex]?.precioUnitario && (
                         <p class="text-xs text-destructive">
-                          {rowErrors()[rowIndex()]?.precioUnitario}
+                          {rowErrors()[rowIndex]?.precioUnitario}
                         </p>
                       )}
                     </div>
@@ -171,7 +171,7 @@ export function TablaProductos(props: TablaProductosProps) {
 
                   <TableCell>
                     <p class="font-semibold text-foreground">
-                      {formatMonedaCop(calcularSubtotal(producto))}
+                      {formatMonedaCop(calcularSubtotal(producto()))}
                     </p>
                   </TableCell>
 
@@ -181,7 +181,7 @@ export function TablaProductos(props: TablaProductosProps) {
                       variant="ghost"
                       size="sm"
                       disabled={props.disabled}
-                      onClick={() => removeRow(rowIndex())}
+                      onClick={() => removeRow(rowIndex)}
                       aria-label="Eliminar producto"
                     >
                       <Trash2 class="h-4 w-4" />
@@ -189,7 +189,7 @@ export function TablaProductos(props: TablaProductosProps) {
                   </TableCell>
                 </TableRow>
               )}
-            </For>
+            </Index>
             <TableRow>
               <TableCell class="font-semibold" colSpan={3}>
                 Total General
