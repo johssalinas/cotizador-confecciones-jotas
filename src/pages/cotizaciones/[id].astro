@@ -1,0 +1,30 @@
+---
+import { FormularioCotizacion } from '@/components/FormularioCotizacion';
+import AppLayout from '@/layouts/AppLayout.astro';
+import { formatNumeroCotizacion } from '@/lib/cotizaciones/calculations';
+import { getCotizacionById } from '@/lib/cotizaciones/repository';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
+
+const id = Astro.params.id;
+
+if (!id) {
+  return Astro.redirect('/');
+}
+
+const supabase = getSupabaseServerClient();
+const cotizacion = await getCotizacionById(supabase, id);
+
+if (!cotizacion) {
+  return Astro.redirect('/');
+}
+---
+
+<AppLayout
+  title={`Cotizacion #${formatNumeroCotizacion(cotizacion.numero)} | Confecciones Jotas`}
+>
+  <FormularioCotizacion
+    client:load
+    mode="edit"
+    initialCotizacion={cotizacion}
+  />
+</AppLayout>

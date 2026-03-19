@@ -1,62 +1,125 @@
-# Astro Starter Kit: Blog
+# Cotizador Web - Confecciones Jotas
 
-```sh
-npm create astro@latest -- --template blog
-```
+Aplicacion web minimalista y rapida para generar y administrar cotizaciones en un pequeno negocio.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Stack
 
-Features:
+- Astro 6 (SSR server-side)
+- SolidJS (componentes interactivos)
+- TanStack Form (captura del formulario)
+- TanStack Table (tabla editable de productos)
+- shadcn/ui para Solid (`shadcn-solid` style components)
+- Supabase (Database + Storage)
+- `pdf-lib` para generacion de PDF
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and Open Graph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
+## Funcionalidades incluidas
 
-## 🚀 Project Structure
+- Inicio con listado de cotizaciones guardadas
+- Vista previa miniatura por cotizacion
+- Crear nueva cotizacion
+- Editar cotizacion existente
+- Duplicar cotizacion
+- Eliminar cotizacion
+- Ver PDF en navegador
+- Descargar PDF
+- Preview de PDF en tiempo real antes de guardar
+- Numero de cotizacion autoincrementable generado en DB
 
-Inside of your Astro project, you'll see the following folders and files:
+## Estructura principal
 
 ```text
-├── public/
-├── src/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+src/
+  components/
+    FormularioCotizacion.tsx
+    TablaProductos.tsx
+    VistaPDF.tsx
+    ListaCotizaciones.tsx
+    ui/
+  layouts/
+    AppLayout.astro
+  lib/
+    cotizaciones/
+    pdf/
+    supabase/
+  pages/
+    index.astro
+    cotizaciones/nueva.astro
+    cotizaciones/[id].astro
+    api/
+supabase/
+  migrations/20260319_init_cotizaciones.sql
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Variables de entorno
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Usa `.env.local` (puedes copiar desde `.env.example`):
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+```bash
+PUBLIC_SUPABASE_URL="https://TU-PROYECTO.supabase.co"
+PUBLIC_SUPABASE_ANON_KEY="TU_ANON_KEY"
+SUPABASE_SERVICE_ROLE_KEY="TU_SERVICE_ROLE_KEY"
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Instalacion local
 
-## 🧞 Commands
+1. Instala dependencias:
 
-All commands are run from the root of the project, from a terminal:
+```bash
+npm install
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+1. Crea tu archivo de entorno:
 
-## 👀 Want to learn more?
+```bash
+cp .env.example .env.local
+```
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+1. Ejecuta la migracion SQL en Supabase SQL Editor:
 
-## Credit
+- `supabase/migrations/20260319_init_cotizaciones.sql`
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+1. Levanta el entorno local:
+
+```bash
+npm run dev
+```
+
+## Build y verificacion
+
+```bash
+npm run check
+npm run build
+npm run preview
+```
+
+## Despliegue en Vercel (recomendado)
+
+1. Importa el repo en Vercel.
+1. Configura variables de entorno:
+
+- `PUBLIC_SUPABASE_URL`
+- `PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+1. Build command:
+
+```bash
+npm run build
+```
+
+## Despliegue en Netlify (alternativo)
+
+1. Instala y configura adapter de Netlify en Astro si quieres target nativo.
+1. Usa las mismas variables de entorno.
+1. Build command: `npm run build`.
+
+## Notas sobre limites
+
+- Tamano maximo por PDF: 2 MB (enforced en bucket Supabase)
+- Bucket publico para PDFs: `cotizaciones`
+- Diseñado para mantenerse dentro de free tier en uso de pequeno negocio
+
+## Seguridad
+
+- Esta version no implementa login por requerimiento.
+- Para produccion abierta en internet, se recomienda agregar una clave operativa o control adicional en una siguiente fase.
