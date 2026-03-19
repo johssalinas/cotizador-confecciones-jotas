@@ -61,7 +61,7 @@ export const POST: APIRoute = async ({ request }) => {
       productos: parsed.data.productos,
     });
 
-    const storagePath = buildPdfStoragePath(draft.numero, draft.id, draft.fecha);
+    const storagePath = buildPdfStoragePath(draft.numero, draft.cliente, draft.fecha);
     const pdfUrl = await uploadPdf(supabase, storagePath, pdfBytes);
 
     const saved = await setCotizacionPdfUrl(supabase, draft.id, pdfUrl);

@@ -71,9 +71,9 @@ export function TablaProductos(props: TablaProductosProps) {
 
   return (
     <div class="space-y-4">
-      <div class="overflow-x-auto rounded-md border border-border bg-card/70 shadow-sm">
+      <div class="hidden overflow-x-auto rounded-md border border-border bg-card/70 shadow-sm md:block">
         <Table>
-          <TableHeader>
+          <TableHeader class="bg-accent/45">
             <TableRow>
               <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">Descripcion del Producto</TableHead>
               <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">Cantidad</TableHead>
@@ -201,10 +201,138 @@ export function TablaProductos(props: TablaProductosProps) {
         </Table>
       </div>
 
+      <div class="space-y-3 md:hidden">
+        <Index each={props.productos}>
+          {(producto, rowIndex) => (
+            <div class="rounded-md border border-border bg-card/80 p-3 shadow-sm">
+              <div class="mb-3 flex items-center justify-between gap-2">
+                <p class="text-sm font-semibold text-foreground">
+                  Producto {rowIndex + 1}
+                </p>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={props.disabled}
+                  onClick={() => removeRow(rowIndex)}
+                  aria-label="Eliminar producto"
+                >
+                  <Trash2 class="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div class="space-y-3">
+                <div class="space-y-1">
+                  <p class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                    Descripcion del producto
+                  </p>
+                  <input
+                    value={producto().descripcion}
+                    placeholder="Ej. Uniforme en tela Lafayette"
+                    class={cn(
+                      inputBaseClass,
+                      shouldShowErrors() && rowErrors()[rowIndex]?.descripcion
+                        ? 'border-destructive focus-visible:ring-destructive/70'
+                        : 'bg-background/80',
+                    )}
+                    disabled={props.disabled}
+                    onInput={(event) => {
+                      updateRow(rowIndex, {
+                        descripcion: event.currentTarget.value,
+                      });
+                    }}
+                  />
+                  {shouldShowErrors() && rowErrors()[rowIndex]?.descripcion && (
+                    <p class="text-xs text-destructive">
+                      {rowErrors()[rowIndex]?.descripcion}
+                    </p>
+                  )}
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <div class="space-y-1">
+                    <p class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                      Cantidad
+                    </p>
+                    <input
+                      type="number"
+                      min={1}
+                      value={String(producto().cantidad)}
+                      class={cn(
+                        inputBaseClass,
+                        shouldShowErrors() && rowErrors()[rowIndex]?.cantidad
+                          ? 'border-destructive focus-visible:ring-destructive/70'
+                          : 'bg-background/80',
+                      )}
+                      disabled={props.disabled}
+                      onInput={(event) => {
+                        const next = Number(event.currentTarget.value);
+                        updateRow(rowIndex, {
+                          cantidad: Number.isNaN(next) ? 0 : next,
+                        });
+                      }}
+                    />
+                    {shouldShowErrors() && rowErrors()[rowIndex]?.cantidad && (
+                      <p class="text-xs text-destructive">
+                        {rowErrors()[rowIndex]?.cantidad}
+                      </p>
+                    )}
+                  </div>
+
+                  <div class="space-y-1">
+                    <p class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                      Precio unitario
+                    </p>
+                    <input
+                      type="number"
+                      min={0}
+                      step="100"
+                      value={String(producto().precioUnitario)}
+                      class={cn(
+                        inputBaseClass,
+                        shouldShowErrors() && rowErrors()[rowIndex]?.precioUnitario
+                          ? 'border-destructive focus-visible:ring-destructive/70'
+                          : 'bg-background/80',
+                      )}
+                      disabled={props.disabled}
+                      onInput={(event) => {
+                        const next = Number(event.currentTarget.value);
+                        updateRow(rowIndex, {
+                          precioUnitario: Number.isNaN(next) ? 0 : next,
+                        });
+                      }}
+                    />
+                    {shouldShowErrors() && rowErrors()[rowIndex]?.precioUnitario && (
+                      <p class="text-xs text-destructive">
+                        {rowErrors()[rowIndex]?.precioUnitario}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between rounded-md bg-accent/35 px-3 py-2">
+                  <p class="text-sm font-semibold text-foreground">SubTotal</p>
+                  <p class="text-sm font-semibold text-foreground">
+                    {formatMonedaCop(calcularSubtotal(producto()))}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </Index>
+
+        <div class="rounded-md border border-border bg-card/90 px-3 py-2">
+          <div class="flex items-center justify-between">
+            <p class="font-semibold text-foreground">Total General</p>
+            <p class="font-semibold text-foreground">{totalGeneral()}</p>
+          </div>
+        </div>
+      </div>
+
       <Button
         type="button"
         variant="secondary"
-        class="cursor-pointer"
+        class="w-full cursor-pointer sm:w-auto"
         onClick={addRow}
         disabled={props.disabled}
       >

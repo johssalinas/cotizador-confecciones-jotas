@@ -40,7 +40,7 @@ export const POST: APIRoute = async ({ params }) => {
 
     const storagePath = buildPdfStoragePath(
       duplicate.numero,
-      duplicate.id,
+      duplicate.cliente,
       duplicate.fecha,
     );
     const pdfUrl = await uploadPdf(supabase, storagePath, pdfBytes);

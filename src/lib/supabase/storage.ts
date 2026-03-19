@@ -2,14 +2,39 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { COTIZACIONES_BUCKET } from './server';
 
-export function buildPdfStoragePath(numero: number, id: string, fecha: string): string {
+function formatNumeroForFile(value: number): string {
+  const normalized = Math.max(0, Math.trunc(value));
+  return normalized.toString().padStart(3, '0');
+}
+
+function sanitizeFileSegment(value: string): string {
+  const normalized = value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return normalized.length > 0 ? normalized : 'cliente';
+}
+
+export function buildPdfBaseName(cliente: string, numero: number): string {
+  return `${sanitizeFileSegment(cliente)}-${formatNumeroForFile(numero)}`;
+}
+
+export function buildPdfDownloadName(cliente: string, numero: number): string {
+  return `${buildPdfBaseName(cliente, numero)}.pdf`;
+}
+
+export function buildPdfStoragePath(numero: number, cliente: string, fecha: string): string {
   const date = new Date(fecha);
   const year = Number.isNaN(date.getTime()) ? new Date().getFullYear() : date.getFullYear();
   const month = Number.isNaN(date.getTime())
     ? `${new Date().getMonth() + 1}`.padStart(2, '0')
     : `${date.getMonth() + 1}`.padStart(2, '0');
+  const fileName = buildPdfDownloadName(cliente, numero);
 
-  return `${year}-${month}/${numero}/${id}.pdf`;
+  return `${year}-${month}/${numero}/${fileName}`;
 }
 
 export async function uploadPdf(

@@ -1,9 +1,8 @@
 import type { APIRoute } from 'astro';
 
-import { formatNumeroCotizacion } from '@/lib/cotizaciones/calculations';
 import { getCotizacionById } from '@/lib/cotizaciones/repository';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
-import { downloadPdfByPublicUrl } from '@/lib/supabase/storage';
+import { buildPdfDownloadName, downloadPdfByPublicUrl } from '@/lib/supabase/storage';
 
 export const GET: APIRoute = async ({ params, url }) => {
   const id = params.id;
@@ -22,7 +21,7 @@ export const GET: APIRoute = async ({ params, url }) => {
 
     const bytes = await downloadPdfByPublicUrl(supabase, cotizacion.pdfUrl);
     const forceDownload = url.searchParams.get('download') === '1';
-    const numero = formatNumeroCotizacion(cotizacion.numero);
+    const fileName = buildPdfDownloadName(cotizacion.cliente, cotizacion.numero);
 
     const body = new Uint8Array(bytes);
 
@@ -32,8 +31,8 @@ export const GET: APIRoute = async ({ params, url }) => {
         'content-type': 'application/pdf',
         'cache-control': 'public, max-age=3600',
         'content-disposition': forceDownload
-          ? `attachment; filename="cotizacion-${numero}.pdf"`
-          : `inline; filename="cotizacion-${numero}.pdf"`,
+          ? `attachment; filename="${fileName}"`
+          : `inline; filename="${fileName}"`,
       },
     });
   } catch (error) {

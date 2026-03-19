@@ -1,8 +1,24 @@
 import { createForm } from '@tanstack/solid-form';
-import { ArrowLeft, LoaderCircle, Save } from 'lucide-solid';
+import {
+  ArrowLeft,
+  CircleCheckBig,
+  Download,
+  Eye,
+  LoaderCircle,
+  Save,
+} from 'lucide-solid';
 import { Show, createMemo, createSignal } from 'solid-js';
 
 import { TablaProductos } from '@/components/TablaProductos';
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
@@ -56,18 +72,6 @@ function createBlankProducto(): ProductoInput {
   };
 }
 
-function openPdfInNewTab(pdfUrl: string) {
-  if (typeof document === 'undefined') {
-    return;
-  }
-
-  const link = document.createElement('a');
-  link.href = pdfUrl;
-  link.target = '_blank';
-  link.rel = 'noreferrer';
-  link.click();
-}
-
 export function FormularioCotizacion(props: FormularioCotizacionProps) {
   const initialProductos =
     props.initialCotizacion?.productos.length && props.initialCotizacion.productos.length > 0
@@ -77,6 +81,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
   const [productos, setProductos] = createSignal<ProductoInput[]>(initialProductos);
   const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
   const [showValidationErrors, setShowValidationErrors] = createSignal(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = createSignal(false);
   const [savedCotizacion, setSavedCotizacion] = createSignal<CotizacionRecord | null>(
     props.initialCotizacion ?? null,
   );
@@ -100,10 +105,11 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
         return;
       }
 
-      const endpoint = props.initialCotizacion
-        ? `/api/cotizaciones/${props.initialCotizacion.id}`
+      const cotizacionActual = savedCotizacion() ?? props.initialCotizacion ?? null;
+      const endpoint = cotizacionActual
+        ? `/api/cotizaciones/${cotizacionActual.id}`
         : '/api/cotizaciones';
-      const method = props.initialCotizacion ? 'PUT' : 'POST';
+      const method = cotizacionActual ? 'PUT' : 'POST';
 
       try {
         const response = await fetch(endpoint, {
@@ -125,13 +131,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
         }
 
         setSavedCotizacion(result.data);
-
-        const pdfUrl = `/api/cotizaciones/${result.data.id}/pdf`;
-        openPdfInNewTab(pdfUrl);
-
-        if (props.mode === 'create') {
-          window.location.assign(`/cotizaciones/${result.data.id}`);
-        }
+        setIsSuccessDialogOpen(true);
       } catch (error) {
         setErrorMessage(
           error instanceof Error
@@ -157,17 +157,49 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
   return (
     <div class="mx-auto w-full max-w-5xl">
       <Card class="overflow-hidden border-border/80 bg-card/90 shadow-lg backdrop-blur">
-        <CardHeader class="border-b border-border/70 bg-gradient-to-r from-[hsl(var(--accent)/0.55)] to-transparent">
-          <a
-            href="/"
-            class={cn(
-              buttonVariants({ variant: 'outline', size: 'sm' }),
-              'mb-4 w-fit gap-2 border-primary/35 bg-primary/10 text-primary hover:bg-primary/20',
-            )}
-          >
-            <ArrowLeft class="h-4 w-4" />
-            Volver al inicio
-          </a>
+        <CardHeader class="border-b border-border/70 bg-linear-to-r from-[hsl(var(--accent)/0.55)] to-transparent">
+          <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <a
+              href="/"
+              class={cn(
+                buttonVariants({ variant: 'outline', size: 'sm' }),
+                'w-fit gap-2 border-primary/35 bg-primary/10 text-primary hover:bg-primary/20',
+              )}
+            >
+              <ArrowLeft class="h-4 w-4" />
+              Volver al inicio
+            </a>
+
+            <Show when={cotizacionId()}>
+              {(id) => (
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                  <a
+                    href={`/api/cotizaciones/${id()}/pdf`}
+                    target="_blank"
+                    rel="noreferrer"
+                    class={cn(
+                      buttonVariants({ variant: 'outline', size: 'sm' }),
+                      'gap-2 border-primary/35 bg-background/80',
+                    )}
+                  >
+                    <Eye class="h-4 w-4" />
+                    Ver PDF
+                  </a>
+                  <a
+                    href={`/api/cotizaciones/${id()}/pdf?download=1`}
+                    class={cn(
+                      buttonVariants({ variant: 'outline', size: 'sm' }),
+                      'gap-2 border-primary/35 bg-background/80',
+                    )}
+                  >
+                    <Download class="h-4 w-4" />
+                    Descargar PDF
+                  </a>
+                </div>
+              )}
+            </Show>
+          </div>
+
           <CardTitle class="text-2xl tracking-wide text-foreground">
             {props.mode === 'create' ? 'Nueva Cotización' : 'Editar Cotización'}
           </CardTitle>
@@ -247,29 +279,80 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                 </Show>
                 Guardar Cotización
               </Button>
-
-              <Show when={cotizacionId()}>
-                {(id) => (
-                  <>
-                    <a
-                      href={`/api/cotizaciones/${id()}/pdf`}
-                      target="_blank"
-                      rel="noreferrer"
-                      class="text-sm text-foreground underline underline-offset-4"
-                    >
-                      Ver PDF
-                    </a>
-                    <a
-                      href={`/api/cotizaciones/${id()}/pdf?download=1`}
-                      class="text-sm text-foreground underline underline-offset-4"
-                    >
-                      Descargar PDF
-                    </a>
-                  </>
-                )}
-              </Show>
             </div>
           </form>
+
+          <AlertDialog
+            open={isSuccessDialogOpen()}
+            onOpenChange={setIsSuccessDialogOpen}
+          >
+            <AlertDialogContent class="w-[min(94vw,56rem)] max-w-4xl border-border/80 bg-card p-0 shadow-2xl">
+              <div class="relative overflow-hidden rounded-lg">
+                <div class="absolute inset-x-0 top-0 h-1.5 bg-linear-to-r from-primary to-primary/60" />
+
+                <div class="grid gap-6 p-6 pt-8 sm:grid-cols-[auto_1fr] sm:items-start">
+                  <div class="mx-auto rounded-full bg-primary/15 p-3 text-primary sm:mx-0">
+                    <CircleCheckBig class="h-8 w-8" />
+                  </div>
+
+                  <div class="space-y-4">
+                    <AlertDialogHeader class="space-y-2 text-left">
+                      <AlertDialogTitle class="text-2xl tracking-wide">
+                        Cotización guardada con éxito
+                      </AlertDialogTitle>
+                      <AlertDialogDescription class="text-base leading-relaxed">
+                        <Show
+                          when={numeroVisible()}
+                          fallback={
+                            'Tu cotización se guardó correctamente.'
+                          }
+                        >
+                          {(numero) => (
+                            <>
+                              La cotización {formatNumeroCotizacion(numero())} se guardó
+                              correctamente.
+                            </>
+                          )}
+                        </Show>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <Show when={cotizacionId()}>
+                      {(id) => (
+                        <div class="flex flex-wrap gap-3">
+                          <a
+                            href={`/api/cotizaciones/${id()}/pdf`}
+                            target="_blank"
+                            rel="noreferrer"
+                            class={cn(buttonVariants({ size: 'lg' }), 'gap-2')}
+                          >
+                            <Eye class="h-4 w-4" />
+                            Ver PDF
+                          </a>
+                          <a
+                            href={`/api/cotizaciones/${id()}/pdf?download=1`}
+                            class={cn(
+                              buttonVariants({ variant: 'outline', size: 'lg' }),
+                              'gap-2',
+                            )}
+                          >
+                            <Download class="h-4 w-4" />
+                            Descargar PDF
+                          </a>
+                        </div>
+                      )}
+                    </Show>
+
+                    <AlertDialogFooter>
+                      <AlertDialogClose class={cn(buttonVariants({ variant: 'secondary' }))}>
+                        Cerrar
+                      </AlertDialogClose>
+                    </AlertDialogFooter>
+                  </div>
+                </div>
+              </div>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
     </div>
