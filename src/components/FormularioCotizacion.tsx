@@ -11,8 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  TextField,
+  TextFieldLabel,
+  TextFieldRoot,
+} from '@/components/ui/textfield';
 import {
   calcularTotal,
   formatMonedaCop,
@@ -153,13 +156,13 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
   );
 
   return (
-    <div class="mx-auto w-full max-w-4xl">
-      <Card>
-        <CardHeader>
-          <CardTitle>
+    <div class="mx-auto w-full max-w-5xl">
+      <Card class="overflow-hidden border-border/80 bg-card/90 shadow-lg backdrop-blur">
+        <CardHeader class="border-b border-border/70 bg-gradient-to-r from-[hsl(var(--accent)/0.55)] to-transparent">
+          <CardTitle class="text-2xl tracking-wide text-foreground">
             {props.mode === 'create' ? 'Nueva Cotizacion' : 'Editar Cotizacion'}
           </CardTitle>
-          <CardDescription>
+          <CardDescription class="leading-relaxed">
             {numeroVisible()
               ? `Numero asignado: ${formatNumeroCotizacion(numeroVisible() ?? 0)}`
               : 'El numero se asigna automaticamente al guardar.'}
@@ -169,7 +172,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
         </CardHeader>
         <CardContent>
           <form
-            class="space-y-6"
+            class="space-y-7"
             onSubmit={async (event) => {
               event.preventDefault();
               await form.handleSubmit();
@@ -178,37 +181,39 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
             <div class="grid gap-4 sm:grid-cols-2">
               <form.Field name="cliente">
                 {(field) => (
-                  <div class="space-y-2">
-                    <Label for="cliente">Nombre del Cliente</Label>
-                    <Input
+                  <TextFieldRoot>
+                    <TextFieldLabel for="cliente">Nombre del Cliente</TextFieldLabel>
+                    <TextField
                       id="cliente"
                       value={field().state.value}
                       placeholder="Ej. Sofia Hernandez"
+                      class="h-10 bg-background/80 text-base"
                       onInput={(event) => field().handleChange(event.currentTarget.value)}
                       onBlur={field().handleBlur}
                     />
-                  </div>
+                  </TextFieldRoot>
                 )}
               </form.Field>
 
               <form.Field name="fecha">
                 {(field) => (
-                  <div class="space-y-2">
-                    <Label for="fecha">Fecha</Label>
-                    <Input
+                  <TextFieldRoot>
+                    <TextFieldLabel for="fecha">Fecha</TextFieldLabel>
+                    <TextField
                       id="fecha"
                       type="date"
                       value={field().state.value}
+                      class="h-10 bg-background/80 text-base"
                       onInput={(event) => field().handleChange(event.currentTarget.value)}
                       onBlur={field().handleBlur}
                     />
-                  </div>
+                  </TextFieldRoot>
                 )}
               </form.Field>
             </div>
 
-            <div class="space-y-2">
-              <Label>Productos</Label>
+            <div class="space-y-3">
+              <p class="text-sm font-semibold tracking-wide text-foreground">Productos</p>
               <TablaProductos
                 productos={productos()}
                 onChange={setProductos}
@@ -216,14 +221,14 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
               />
             </div>
 
-            <div class="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3">
-              <p class="text-sm text-neutral-600">Total General</p>
-              <p class="text-2xl font-semibold text-neutral-900">{total()}</p>
+            <div class="rounded-md border border-border bg-muted/40 px-4 py-3 shadow-sm">
+              <p class="text-sm text-muted-foreground">Total General</p>
+              <p class="text-2xl font-semibold text-foreground">{total()}</p>
             </div>
 
             <Show when={errorMessage()}>
               {(message) => (
-                <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div class="rounded-md border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                   {message()}
                 </div>
               )}
@@ -244,13 +249,13 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                       href={`/api/cotizaciones/${id()}/pdf`}
                       target="_blank"
                       rel="noreferrer"
-                      class="text-sm text-neutral-700 underline underline-offset-4"
+                      class="text-sm text-foreground underline underline-offset-4"
                     >
                       Ver PDF
                     </a>
                     <a
                       href={`/api/cotizaciones/${id()}/pdf?download=1`}
-                      class="text-sm text-neutral-700 underline underline-offset-4"
+                      class="text-sm text-foreground underline underline-offset-4"
                     >
                       Descargar PDF
                     </a>
@@ -258,7 +263,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                 )}
               </Show>
 
-              <a href="/" class="text-sm text-neutral-600 underline underline-offset-4">
+              <a href="/" class="text-sm text-muted-foreground underline underline-offset-4">
                 Volver al inicio
               </a>
             </div>

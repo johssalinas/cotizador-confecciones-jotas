@@ -1,98 +1,128 @@
-import * as DialogPrimitive from '@kobalte/core/dialog';
-import { X } from 'lucide-solid';
-import { type ComponentProps, splitProps } from 'solid-js';
+import { cn } from "@/lib/utils";
+import type {
+	DialogContentProps,
+	DialogDescriptionProps,
+	DialogTitleProps,
+} from "@kobalte/core/dialog";
+import { Dialog as DialogPrimitive } from "@kobalte/core/dialog";
+import type { PolymorphicProps } from "@kobalte/core/polymorphic";
+import type { ComponentProps, ParentProps, ValidComponent } from "solid-js";
+import { splitProps } from "solid-js";
 
-import { cn } from '@/lib/utils';
-
-export const Dialog = DialogPrimitive.Root;
+export const Dialog = DialogPrimitive;
 export const DialogTrigger = DialogPrimitive.Trigger;
-export const DialogClose = DialogPrimitive.CloseButton;
 
-export function DialogContent(props: ComponentProps<typeof DialogPrimitive.Content>) {
-  const [local, rest] = splitProps(props, ['class', 'children']);
+type dialogContentProps<T extends ValidComponent = "div"> = ParentProps<
+	DialogContentProps<T> & {
+		class?: string;
+	}
+>;
 
-  return (
-    <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay class="fixed inset-0 z-50 bg-black/45" />
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <DialogPrimitive.Content
-          class={cn(
-            'w-full max-w-lg rounded-xl border border-neutral-200 bg-white p-6 shadow-xl focus:outline-none',
-            local.class,
-          )}
-          {...rest}
-        >
-          {local.children}
-          <DialogPrimitive.CloseButton class="absolute right-4 top-4 rounded-md p-1 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800">
-            <X class="h-4 w-4" />
-            <span class="sr-only">Cerrar</span>
-          </DialogPrimitive.CloseButton>
-        </DialogPrimitive.Content>
-      </div>
-    </DialogPrimitive.Portal>
-  );
-}
+export const DialogContent = <T extends ValidComponent = "div">(
+	props: PolymorphicProps<T, dialogContentProps<T>>,
+) => {
+	const [local, rest] = splitProps(props as dialogContentProps, [
+		"class",
+		"children",
+	]);
 
-export function DialogHeader(props: ComponentProps<'div'>) {
-  const [local, rest] = splitProps(props, ['class']);
-  return <div class={cn('mb-4 space-y-1.5', local.class)} {...rest} />;
-}
+	return (
+		<DialogPrimitive.Portal>
+			<DialogPrimitive.Overlay
+				class={cn(
+					"fixed inset-0 z-50 bg-background/80 data-[expanded]:animate-in data-[closed]:animate-out data-[closed]:fade-out-0 data-[expanded]:fade-in-0",
+				)}
+				{...rest}
+			/>
+			<DialogPrimitive.Content
+				class={cn(
+					"fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg data-[closed]:duration-200 data-[expanded]:duration-200 data-[expanded]:animate-in data-[closed]:animate-out data-[closed]:fade-out-0 data-[expanded]:fade-in-0 data-[closed]:zoom-out-95 data-[expanded]:zoom-in-95 data-[closed]:slide-out-to-left-1/2 data-[closed]:slide-out-to-top-[48%] data-[expanded]:slide-in-from-left-1/2 data-[expanded]:slide-in-from-top-[48%] sm:rounded-lg md:w-full",
+					local.class,
+				)}
+				{...rest}
+			>
+				{local.children}
+				<DialogPrimitive.CloseButton class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-[opacity,box-shadow] hover:opacity-100 focus:outline-none focus:ring-[1.5px] focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						class="h-4 w-4"
+					>
+						<path
+							fill="none"
+							stroke="currentColor"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M18 6L6 18M6 6l12 12"
+						/>
+						<title>Close</title>
+					</svg>
+				</DialogPrimitive.CloseButton>
+			</DialogPrimitive.Content>
+		</DialogPrimitive.Portal>
+	);
+};
 
-export function DialogTitle(props: ComponentProps<typeof DialogPrimitive.Title>) {
-  const [local, rest] = splitProps(props, ['class']);
-  return <DialogPrimitive.Title class={cn('text-lg font-semibold', local.class)} {...rest} />;
-}
+type dialogTitleProps<T extends ValidComponent = "h2"> = DialogTitleProps<T> & {
+	class?: string;
+};
 
-export function DialogDescription(
-  props: ComponentProps<typeof DialogPrimitive.Description>,
-) {
-  const [local, rest] = splitProps(props, ['class']);
-  return (
-    <DialogPrimitive.Description class={cn('text-sm text-neutral-600', local.class)} {...rest} />
-  );
-}
+export const DialogTitle = <T extends ValidComponent = "h2">(
+	props: PolymorphicProps<T, dialogTitleProps<T>>,
+) => {
+	const [local, rest] = splitProps(props as dialogTitleProps, ["class"]);
 
-export function DialogFooter(props: ComponentProps<'div'>) {
-  const [local, rest] = splitProps(props, ['class']);
-  return (
-    <div
-      class={cn('mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', local.class)}
-      {...rest}
-    />
-  );
-}
+	return (
+		<DialogPrimitive.Title
+			class={cn("text-lg font-semibold text-foreground", local.class)}
+			{...rest}
+		/>
+	);
+};
 
-export function DialogAction(props: ComponentProps<'button'>) {
-  const [local, rest] = splitProps(props, ['class']);
-  return (
-    <DialogPrimitive.CloseButton
-      class={cn(
-        'inline-flex h-10 items-center justify-center rounded-md bg-rose-600 px-4 text-sm font-medium text-white hover:bg-rose-700 disabled:pointer-events-none disabled:opacity-50',
-        local.class,
-      )}
-      {...rest}
-    />
-  );
-}
+type dialogDescriptionProps<T extends ValidComponent = "p"> =
+	DialogDescriptionProps<T> & {
+		class?: string;
+	};
 
-export function DialogCancel(props: ComponentProps<'button'>) {
-  const [local, rest] = splitProps(props, ['class']);
-  return (
-    <DialogPrimitive.CloseButton
-      class={cn(
-        'inline-flex h-10 items-center justify-center rounded-md border border-neutral-300 bg-white px-4 text-sm font-medium text-neutral-900 hover:bg-neutral-100',
-        local.class,
-      )}
-      {...rest}
-    />
-  );
-}
+export const DialogDescription = <T extends ValidComponent = "p">(
+	props: PolymorphicProps<T, dialogDescriptionProps<T>>,
+) => {
+	const [local, rest] = splitProps(props as dialogDescriptionProps, ["class"]);
 
-export function DialogOverlay(props: ComponentProps<typeof DialogPrimitive.Overlay>) {
-  const [local, rest] = splitProps(props, ['class']);
-  return <DialogPrimitive.Overlay class={cn('fixed inset-0 bg-black/45', local.class)} {...rest} />;
-}
+	return (
+		<DialogPrimitive.Description
+			class={cn("text-sm text-muted-foreground", local.class)}
+			{...rest}
+		/>
+	);
+};
 
-export function DialogPortal(props: ComponentProps<typeof DialogPrimitive.Portal>) {
-  return <DialogPrimitive.Portal {...props} />;
-}
+export const DialogHeader = (props: ComponentProps<"div">) => {
+	const [local, rest] = splitProps(props, ["class"]);
+
+	return (
+		<div
+			class={cn(
+				"flex flex-col space-y-2 text-center sm:text-left",
+				local.class,
+			)}
+			{...rest}
+		/>
+	);
+};
+
+export const DialogFooter = (props: ComponentProps<"div">) => {
+	const [local, rest] = splitProps(props, ["class"]);
+
+	return (
+		<div
+			class={cn(
+				"flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+				local.class,
+			)}
+			{...rest}
+		/>
+	);
+};

@@ -2,7 +2,7 @@ import { Plus, Trash2 } from 'lucide-solid';
 import { Index, createMemo } from 'solid-js';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { TextField, TextFieldRoot } from '@/components/ui/textfield';
 import {
   Table,
   TableBody,
@@ -61,14 +61,14 @@ export function TablaProductos(props: TablaProductosProps) {
 
   return (
     <div class="space-y-4">
-      <div class="overflow-x-auto rounded-lg border border-neutral-200">
+      <div class="overflow-x-auto rounded-md border border-border bg-card/70 shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Descripcion del Producto</TableHead>
-              <TableHead>Cantidad</TableHead>
-              <TableHead>Precio Unitario</TableHead>
-              <TableHead>Total</TableHead>
+              <TableHead class="text-xs uppercase tracking-[0.08em]">Descripcion del Producto</TableHead>
+              <TableHead class="text-xs uppercase tracking-[0.08em]">Cantidad</TableHead>
+              <TableHead class="text-xs uppercase tracking-[0.08em]">Precio Unitario</TableHead>
+              <TableHead class="text-xs uppercase tracking-[0.08em]">Total</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
@@ -77,14 +77,14 @@ export function TablaProductos(props: TablaProductosProps) {
               {(producto, rowIndex) => (
                 <TableRow>
                   <TableCell>
-                    <div class="space-y-1">
-                      <Input
+                    <TextFieldRoot>
+                      <TextField
                         value={producto().descripcion}
                         placeholder="Ej. Uniforme en tela Lafayette"
                         class={
                           rowErrors()[rowIndex]?.descripcion
-                            ? 'border-red-400 focus-visible:ring-red-300'
-                            : ''
+                            ? 'border-destructive focus-visible:ring-destructive/70'
+                            : 'bg-background/80'
                         }
                         disabled={props.disabled}
                         onInput={(event) => {
@@ -94,23 +94,23 @@ export function TablaProductos(props: TablaProductosProps) {
                         }}
                       />
                       {rowErrors()[rowIndex]?.descripcion && (
-                        <p class="text-xs text-red-600">
+                        <p class="text-xs text-destructive">
                           {rowErrors()[rowIndex]?.descripcion}
                         </p>
                       )}
-                    </div>
+                    </TextFieldRoot>
                   </TableCell>
 
                   <TableCell>
-                    <div class="space-y-1">
-                      <Input
+                    <TextFieldRoot>
+                      <TextField
                         type="number"
                         min={1}
                         value={String(producto().cantidad)}
                         class={
                           rowErrors()[rowIndex]?.cantidad
-                            ? 'border-red-400 focus-visible:ring-red-300'
-                            : ''
+                            ? 'border-destructive focus-visible:ring-destructive/70'
+                            : 'bg-background/80'
                         }
                         disabled={props.disabled}
                         onInput={(event) => {
@@ -121,24 +121,24 @@ export function TablaProductos(props: TablaProductosProps) {
                         }}
                       />
                       {rowErrors()[rowIndex]?.cantidad && (
-                        <p class="text-xs text-red-600">
+                        <p class="text-xs text-destructive">
                           {rowErrors()[rowIndex]?.cantidad}
                         </p>
                       )}
-                    </div>
+                    </TextFieldRoot>
                   </TableCell>
 
                   <TableCell>
-                    <div class="space-y-1">
-                      <Input
+                    <TextFieldRoot>
+                      <TextField
                         type="number"
                         min={0}
                         step="100"
                         value={String(producto().precioUnitario)}
                         class={
                           rowErrors()[rowIndex]?.precioUnitario
-                            ? 'border-red-400 focus-visible:ring-red-300'
-                            : ''
+                            ? 'border-destructive focus-visible:ring-destructive/70'
+                            : 'bg-background/80'
                         }
                         disabled={props.disabled}
                         onInput={(event) => {
@@ -149,15 +149,15 @@ export function TablaProductos(props: TablaProductosProps) {
                         }}
                       />
                       {rowErrors()[rowIndex]?.precioUnitario && (
-                        <p class="text-xs text-red-600">
+                        <p class="text-xs text-destructive">
                           {rowErrors()[rowIndex]?.precioUnitario}
                         </p>
                       )}
-                    </div>
+                    </TextFieldRoot>
                   </TableCell>
 
                   <TableCell>
-                    <p class="font-semibold text-neutral-800">
+                    <p class="font-semibold text-foreground">
                       {formatMonedaCop(calcularSubtotal(producto()))}
                     </p>
                   </TableCell>

@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/card';
 import {
   Dialog,
-  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -124,11 +123,11 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
   };
 
   return (
-    <Card>
-      <CardHeader class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <Card class="overflow-hidden border-border/80 bg-card/90 shadow-lg backdrop-blur">
+      <CardHeader class="border-b border-border/70 bg-gradient-to-r from-[hsl(var(--accent)/0.55)] to-transparent sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <CardTitle>Cotizaciones Guardadas</CardTitle>
-          <CardDescription>
+          <CardTitle class="text-2xl tracking-wide">Cotizaciones Guardadas</CardTitle>
+          <CardDescription class="mt-2 leading-relaxed">
             Historial de documentos con acciones para ver, descargar, editar, duplicar y eliminar.
           </CardDescription>
         </div>
@@ -149,22 +148,22 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
       <CardContent>
         <Show when={errorMessage()}>
           {(message) => (
-            <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div class="mb-4 rounded-md border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {message()}
             </div>
           )}
         </Show>
 
-        <div class="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+        <div class="hidden overflow-x-auto rounded-md border border-border bg-card/70 shadow-sm lg:block">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Vista previa</TableHead>
-                <TableHead>Numero</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Fecha</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead class="text-right">Acciones</TableHead>
+                <TableHead class="text-xs uppercase tracking-[0.08em]">Vista previa</TableHead>
+                <TableHead class="text-xs uppercase tracking-[0.08em]">Numero</TableHead>
+                <TableHead class="text-xs uppercase tracking-[0.08em]">Cliente</TableHead>
+                <TableHead class="text-xs uppercase tracking-[0.08em]">Fecha</TableHead>
+                <TableHead class="text-xs uppercase tracking-[0.08em]">Total</TableHead>
+                <TableHead class="text-right text-xs uppercase tracking-[0.08em]">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -179,7 +178,7 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
                           title={`Miniatura cotizacion ${formatNumeroCotizacion(item.numero)}`}
                           src={`${item.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                           loading="lazy"
-                          class="h-28 w-20 rounded border border-neutral-200 bg-white"
+                          class="h-28 w-20 rounded border border-border bg-background"
                         />
                       </TableCell>
                       <TableCell class="font-semibold">
@@ -244,21 +243,21 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
               const isActive = () => activeId() === item.id;
 
               return (
-                <div class="rounded-lg border border-neutral-200 p-4">
+                <div class="rounded-md border border-border bg-card/80 p-4 shadow-sm">
                   <div class="mb-3 flex gap-3">
                     <iframe
                       title={`Miniatura cotizacion ${formatNumeroCotizacion(item.numero)}`}
                       src={`${item.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                       loading="lazy"
-                      class="h-24 w-16 rounded border border-neutral-200 bg-white"
+                      class="h-24 w-16 rounded border border-border bg-background"
                     />
                     <div class="space-y-1 text-sm">
-                      <p class="font-semibold text-neutral-900">
+                      <p class="font-semibold text-foreground">
                         Cotizacion #{formatNumeroCotizacion(item.numero)}
                       </p>
-                      <p class="text-neutral-600">{item.cliente}</p>
-                      <p class="text-neutral-600">{formatFechaLarga(item.fecha)}</p>
-                      <p class="font-semibold text-neutral-900">{formatMonedaCop(item.total)}</p>
+                      <p class="text-muted-foreground">{item.cliente}</p>
+                      <p class="text-muted-foreground">{formatFechaLarga(item.fecha)}</p>
+                      <p class="font-semibold text-foreground">{formatMonedaCop(item.total)}</p>
                     </div>
                   </div>
                   <div class="grid grid-cols-3 gap-2">
@@ -307,7 +306,7 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
         </div>
 
         <Dialog open={Boolean(deleteTarget())} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-          <DialogContent>
+          <DialogContent class="border-border bg-card">
             <DialogHeader>
               <DialogTitle>
                 <Show when={deleteTarget()}>
@@ -320,7 +319,9 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <DialogCancel>Cancelar</DialogCancel>
+              <Dialog.CloseButton class={cn(buttonVariants({ variant: 'outline' }))}>
+                Cancelar
+              </Dialog.CloseButton>
               <Button variant="destructive" onClick={remove}>
                 Eliminar
               </Button>

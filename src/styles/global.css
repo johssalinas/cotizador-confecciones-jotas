@@ -1,33 +1,95 @@
 @import 'tailwindcss';
 
-@font-face {
-  font-family: 'Atkinson';
-  src: url('/fonts/atkinson-regular.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Atkinson';
-  src: url('/fonts/atkinson-bold.woff') format('woff');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   color-scheme: light;
+  --radius: 0.45rem;
+
+  --background: 338 100% 98%;
+  --foreground: 336 35% 18%;
+
+  --card: 338 92% 99%;
+  --card-foreground: 336 35% 18%;
+
+  --popover: 338 92% 99%;
+  --popover-foreground: 336 35% 18%;
+
+  --primary: 338 77% 48%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 334 52% 92%;
+  --secondary-foreground: 334 35% 22%;
+
+  --muted: 332 36% 93%;
+  --muted-foreground: 332 18% 43%;
+
+  --accent: 333 66% 88%;
+  --accent-foreground: 334 35% 22%;
+
+  --destructive: 0 72% 45%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 333 38% 82%;
+  --input: 333 38% 82%;
+  --ring: 338 70% 53%;
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
 }
 
 body {
   position: relative;
   min-height: 100vh;
-  font-family: 'Atkinson', sans-serif;
+  font-family: 'Times New Roman', Times, serif;
   font-size: 18px;
-  line-height: 1.5;
-  color: #171717;
-  background: radial-gradient(circle at 85% -20%, #ffdbe8 0%, #fffaf6 40%, #f9f9f9 100%);
+  line-height: 1.55;
+  color: hsl(var(--foreground));
+  background:
+    radial-gradient(circle at 8% 8%, rgb(244 114 182 / 30%), transparent 34%),
+    radial-gradient(circle at 92% 0%, rgb(251 113 133 / 16%), transparent 33%),
+    linear-gradient(180deg, #fff6fb 0%, #ffeef8 48%, #ffe7f4 100%);
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: 0.015em;
+}
+
+a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 
 .app-background {
@@ -35,14 +97,32 @@ body {
   inset: 0;
   z-index: -1;
   background-image:
-    radial-gradient(circle at 10% 20%, rgb(251 113 133 / 18%), transparent 34%),
-    radial-gradient(circle at 90% 15%, rgb(251 191 36 / 18%), transparent 28%),
-    radial-gradient(circle at 40% 100%, rgb(244 114 182 / 12%), transparent 35%);
+    linear-gradient(
+      90deg,
+      transparent 0,
+      transparent calc(100% - 1px),
+      rgb(190 24 93 / 12%) calc(100% - 1px)
+    ),
+    linear-gradient(
+      180deg,
+      transparent 0,
+      transparent calc(100% - 1px),
+      rgb(190 24 93 / 10%) calc(100% - 1px)
+    );
+  background-size: 88px 88px, 88px 88px;
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 22%), transparent 75%);
   pointer-events: none;
 }
 
 @media (max-width: 768px) {
   body {
     font-size: 17px;
+    background:
+      radial-gradient(circle at 12% 8%, rgb(244 114 182 / 24%), transparent 32%),
+      linear-gradient(180deg, #fff7fc 0%, #ffedf8 100%);
+  }
+
+  .app-background {
+    background-size: 56px 56px, 56px 56px;
   }
 }
