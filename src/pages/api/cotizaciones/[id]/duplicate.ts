@@ -28,7 +28,6 @@ export const POST: APIRoute = async ({ params }) => {
     const duplicate = await createCotizacionDraft(supabase, {
       cliente: source.cliente,
       fecha: source.fecha,
-      observaciones: source.observaciones,
       productos: source.productos,
     });
 
@@ -36,7 +35,6 @@ export const POST: APIRoute = async ({ params }) => {
       numero: duplicate.numero,
       cliente: duplicate.cliente,
       fecha: duplicate.fecha,
-      observaciones: duplicate.observaciones,
       productos: duplicate.productos,
     });
 

@@ -18,7 +18,6 @@ interface DbCotizacionRow {
   fecha: string;
   total: number | string;
   pdf_url: string;
-  observaciones: string | null;
   productos: unknown;
   created_at: string;
   updated_at: string;
@@ -34,7 +33,6 @@ function mapDbCotizacion(row: DbCotizacionRow): CotizacionRecord {
     fecha: row.fecha,
     total: Number(row.total),
     pdfUrl: row.pdf_url,
-    observaciones: row.observaciones ?? '',
     productos: parsedProductos.success ? parsedProductos.data : [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -100,7 +98,6 @@ export async function createCotizacionDraft(
     cliente: parsed.data.cliente,
     fecha: parsed.data.fecha,
     total,
-    observaciones: parsed.data.observaciones,
     productos: parsed.data.productos,
     pdf_url: '',
   };
@@ -133,7 +130,6 @@ export async function updateCotizacionData(
     cliente: parsed.data.cliente,
     fecha: parsed.data.fecha,
     total,
-    observaciones: parsed.data.observaciones,
     productos: parsed.data.productos,
   };
 

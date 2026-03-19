@@ -22,14 +22,12 @@ const ROW_HEIGHT = 30;
 const FONT_SIZE_BODY = 14;
 const FONT_SIZE_TITLE = 15;
 const FONT_SIZE_TABLE = 12;
-const OBS_LABEL_OFFSET = 34;
-const OBS_TEXT_OFFSET = 52;
 const CLOSING_GAP_AFTER_CONTENT = 58;
 const CLOSING_LINE_GAP = 24;
 const MIN_CLOSING_Y = 224;
 const SIGNATURE_GAP_AFTER_CLOSING = 100;
-const MIN_SIGNATURE_LINE_Y = 95;
-const MAX_SIGNATURE_LINE_Y = 112;
+const MIN_SIGNATURE_LINE_Y = 102;
+const MAX_SIGNATURE_LINE_Y = 118;
 
 const LOGO_CANDIDATES = [
   resolve(process.cwd(), 'public/assets/logo.png'),
@@ -40,7 +38,6 @@ interface CotizacionPdfData {
   numero: number;
   cliente: string;
   fecha: string;
-  observaciones?: string;
   productos: ProductoInput[];
   firmante?: string;
 }
@@ -430,31 +427,7 @@ export async function buildCotizacionPdf(data: CotizacionPdfData): Promise<Uint8
     FONT_SIZE_TABLE,
   );
 
-  const observaciones = data.observaciones?.trim() ?? '';
-  let contentBottomY = currentY;
-
-  if (observaciones.length > 0) {
-    const observacionesLabelY = currentY - OBS_LABEL_OFFSET;
-    const observacionesTextY = currentY - OBS_TEXT_OFFSET;
-
-    page.drawText('Observaciones:', {
-      x: MARGIN_X,
-      y: observacionesLabelY,
-      size: FONT_SIZE_BODY,
-      font: boldFont,
-      color: rgb(0.1, 0.1, 0.1),
-    });
-
-    page.drawText(truncateText(observaciones, 95), {
-      x: MARGIN_X,
-      y: observacionesTextY,
-      size: FONT_SIZE_BODY,
-      font: italicFont,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-
-    contentBottomY = observacionesTextY;
-  }
+  const contentBottomY = currentY;
 
   // Keep the closing block close to the latest content while preserving footer clearance.
   const agradecimientoY = Math.max(MIN_CLOSING_Y, contentBottomY - CLOSING_GAP_AFTER_CONTENT);

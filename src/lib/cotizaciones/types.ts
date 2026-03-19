@@ -9,7 +9,6 @@ export const productoSchema = z.object({
 export const cotizacionInputSchema = z.object({
   cliente: z.string().trim().min(2, 'Ingresa el nombre del cliente.'),
   fecha: z.string().min(1, 'Ingresa una fecha.'),
-  observaciones: z.string().trim().max(1200).optional().default(''),
   productos: z.array(productoSchema).min(1, 'Debes agregar al menos un producto.'),
 });
 
@@ -23,7 +22,6 @@ export interface CotizacionRecord {
   fecha: string;
   total: number;
   pdfUrl: string;
-  observaciones: string;
   productos: ProductoInput[];
   createdAt: string;
   updatedAt: string;

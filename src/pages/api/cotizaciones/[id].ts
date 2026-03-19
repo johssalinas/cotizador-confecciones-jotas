@@ -78,7 +78,6 @@ export const PUT: APIRoute = async ({ params, request }) => {
       numero: updated.numero,
       cliente: parsed.data.cliente,
       fecha: parsed.data.fecha,
-      observaciones: parsed.data.observaciones,
       productos: parsed.data.productos,
     });
 

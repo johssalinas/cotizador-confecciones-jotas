@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   calcularTotal,
   formatMonedaCop,
@@ -55,6 +54,18 @@ function createBlankProducto(): ProductoInput {
   };
 }
 
+function openPdfInNewTab(pdfUrl: string) {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  const link = document.createElement('a');
+  link.href = pdfUrl;
+  link.target = '_blank';
+  link.rel = 'noreferrer';
+  link.click();
+}
+
 export function FormularioCotizacion(props: FormularioCotizacionProps) {
   const initialProductos =
     props.initialCotizacion?.productos.length && props.initialCotizacion.productos.length > 0
@@ -66,21 +77,11 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
   const [savedCotizacion, setSavedCotizacion] = createSignal<CotizacionRecord | null>(
     props.initialCotizacion ?? null,
   );
-  let pendingPdfWindow: Window | null = null;
-
-  const closePendingPdfWindow = () => {
-    if (pendingPdfWindow && !pendingPdfWindow.closed) {
-      pendingPdfWindow.close();
-    }
-
-    pendingPdfWindow = null;
-  };
 
   const form = createForm(() => ({
     defaultValues: {
       cliente: props.initialCotizacion?.cliente ?? '',
       fecha: normalizeDate(props.initialCotizacion?.fecha),
-      observaciones: props.initialCotizacion?.observaciones ?? '',
     },
     onSubmit: async ({ value }) => {
       setErrorMessage(null);
@@ -92,7 +93,6 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
 
       const parsed = cotizacionInputSchema.safeParse(payload);
       if (!parsed.success) {
-        closePendingPdfWindow();
         setErrorMessage('Revisa los datos del formulario antes de guardar.');
         return;
       }
@@ -117,7 +117,6 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
         };
 
         if (!response.ok || !result.data) {
-          closePendingPdfWindow();
           setErrorMessage(result.error ?? 'No fue posible guardar la cotizacion.');
           return;
         }
@@ -125,18 +124,12 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
         setSavedCotizacion(result.data);
 
         const pdfUrl = `/api/cotizaciones/${result.data.id}/pdf`;
-        if (pendingPdfWindow && !pendingPdfWindow.closed) {
-          pendingPdfWindow.location.href = pdfUrl;
-          pendingPdfWindow = null;
-        } else {
-          window.open(pdfUrl, '_blank', 'noopener,noreferrer');
-        }
+        openPdfInNewTab(pdfUrl);
 
         if (props.mode === 'create') {
           window.location.assign(`/cotizaciones/${result.data.id}`);
         }
       } catch (error) {
-        closePendingPdfWindow();
         setErrorMessage(
           error instanceof Error
             ? error.message
@@ -179,11 +172,6 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
             class="space-y-6"
             onSubmit={async (event) => {
               event.preventDefault();
-
-              if (typeof window !== 'undefined') {
-                pendingPdfWindow = window.open('', '_blank', 'noopener,noreferrer');
-              }
-
               await form.handleSubmit();
             }}
           >
@@ -227,22 +215,6 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                 disabled={isSubmitting()}
               />
             </div>
-
-            <form.Field name="observaciones">
-              {(field) => (
-                <div class="space-y-2">
-                  <Label for="observaciones">Observaciones</Label>
-                  <Textarea
-                    id="observaciones"
-                    rows={4}
-                    value={field().state.value}
-                    placeholder="Notas opcionales para el cliente"
-                    onInput={(event) => field().handleChange(event.currentTarget.value)}
-                    onBlur={field().handleBlur}
-                  />
-                </div>
-              )}
-            </form.Field>
 
             <div class="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3">
               <p class="text-sm text-neutral-600">Total General</p>

@@ -10,7 +10,6 @@ create table if not exists public.cotizaciones (
   fecha date not null default current_date,
   total numeric(12, 2) not null check (total >= 0),
   pdf_url text not null default '',
-  observaciones text,
   productos jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now()),
