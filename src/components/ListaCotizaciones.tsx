@@ -233,7 +233,7 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
 
   return (
     <Card class="overflow-hidden border-border/80 bg-card/90 shadow-lg backdrop-blur">
-      <CardHeader class="border-b border-border/70 bg-gradient-to-r from-[hsl(var(--accent)/0.55)] to-transparent sm:flex-row sm:items-center sm:justify-between">
+      <CardHeader class="border-b border-border/70 bg-linear-to-r from-[hsl(var(--accent)/0.55)] to-transparent sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle class="text-2xl tracking-wide">Cotizaciones Guardadas</CardTitle>
           <CardDescription class="mt-2 leading-relaxed">
@@ -258,9 +258,9 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
           )}
         </Show>
 
-        <div class="hidden overflow-x-auto rounded-md border border-border bg-card/70 px-3 shadow-sm lg:block">
+        <div class="hidden overflow-x-auto rounded-md border border-border bg-card/70 shadow-sm lg:block">
           <Table>
-            <TableHeader>
+            <TableHeader class="bg-accent/45 [&_th]:font-bold">
               <TableRow>
                 <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Número</TableHead>
                 <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Cliente</TableHead>
@@ -284,7 +284,7 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
                       <TableCell class="px-4 py-5">
                         <p
                           title={formatProductosTooltip(item.descripcionesProductos)}
-                          class="max-h-16 max-w-[21rem] overflow-hidden text-sm leading-relaxed [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
+                          class="max-h-16 max-w-84 overflow-hidden text-sm leading-relaxed [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
                         >
                           {formatProductosPreview(item.descripcionesProductos)}
                         </p>

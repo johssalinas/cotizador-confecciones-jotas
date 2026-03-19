@@ -48,6 +48,25 @@ export function TablaProductos(props: TablaProductosProps) {
     }));
   });
 
+  const formatPrecioInput = (value: number) => {
+    const safeValue = Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
+
+    return new Intl.NumberFormat('es-CO', {
+      maximumFractionDigits: 0,
+    }).format(safeValue);
+  };
+
+  const parsePrecioInput = (rawValue: string) => {
+    const digitsOnly = rawValue.replace(/\D+/g, '');
+
+    if (!digitsOnly) {
+      return 0;
+    }
+
+    const parsed = Number(digitsOnly);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  };
+
   const updateRow = (index: number, patch: Partial<ProductoInput>) => {
     props.onChange((current) =>
       current.map((producto, rowIndex) =>
@@ -142,25 +161,33 @@ export function TablaProductos(props: TablaProductosProps) {
 
                   <TableCell>
                     <div class="space-y-1">
-                      <input
-                        type="number"
-                        min={0}
-                        step="100"
-                        value={String(producto().precioUnitario)}
-                        class={cn(
-                          inputBaseClass,
-                          shouldShowErrors() && rowErrors()[rowIndex]?.precioUnitario
-                            ? 'border-destructive focus-visible:ring-destructive/70'
-                            : 'bg-background/80',
-                        )}
-                        disabled={props.disabled}
-                        onInput={(event) => {
-                          const next = Number(event.currentTarget.value);
-                          updateRow(rowIndex, {
-                            precioUnitario: Number.isNaN(next) ? 0 : next,
-                          });
-                        }}
-                      />
+                      <div class="relative">
+                        <span
+                          aria-hidden="true"
+                          class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground"
+                        >
+                          $
+                        </span>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={formatPrecioInput(producto().precioUnitario)}
+                          class={cn(
+                            inputBaseClass,
+                            'pl-7',
+                            shouldShowErrors() && rowErrors()[rowIndex]?.precioUnitario
+                              ? 'border-destructive focus-visible:ring-destructive/70'
+                              : 'bg-background/80',
+                          )}
+                          disabled={props.disabled}
+                          onInput={(event) => {
+                            const next = parsePrecioInput(event.currentTarget.value);
+                            updateRow(rowIndex, {
+                              precioUnitario: next,
+                            });
+                          }}
+                        />
+                      </div>
                       {shouldShowErrors() && rowErrors()[rowIndex]?.precioUnitario && (
                         <p class="text-xs text-destructive">
                           {rowErrors()[rowIndex]?.precioUnitario}
@@ -283,25 +310,33 @@ export function TablaProductos(props: TablaProductosProps) {
                     <p class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                       Precio unitario
                     </p>
-                    <input
-                      type="number"
-                      min={0}
-                      step="100"
-                      value={String(producto().precioUnitario)}
-                      class={cn(
-                        inputBaseClass,
-                        shouldShowErrors() && rowErrors()[rowIndex]?.precioUnitario
-                          ? 'border-destructive focus-visible:ring-destructive/70'
-                          : 'bg-background/80',
-                      )}
-                      disabled={props.disabled}
-                      onInput={(event) => {
-                        const next = Number(event.currentTarget.value);
-                        updateRow(rowIndex, {
-                          precioUnitario: Number.isNaN(next) ? 0 : next,
-                        });
-                      }}
-                    />
+                    <div class="relative">
+                      <span
+                        aria-hidden="true"
+                        class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground"
+                      >
+                        $
+                      </span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={formatPrecioInput(producto().precioUnitario)}
+                        class={cn(
+                          inputBaseClass,
+                          'pl-7',
+                          shouldShowErrors() && rowErrors()[rowIndex]?.precioUnitario
+                            ? 'border-destructive focus-visible:ring-destructive/70'
+                            : 'bg-background/80',
+                        )}
+                        disabled={props.disabled}
+                        onInput={(event) => {
+                          const next = parsePrecioInput(event.currentTarget.value);
+                          updateRow(rowIndex, {
+                            precioUnitario: next,
+                          });
+                        }}
+                      />
+                    </div>
                     {shouldShowErrors() && rowErrors()[rowIndex]?.precioUnitario && (
                       <p class="text-xs text-destructive">
                         {rowErrors()[rowIndex]?.precioUnitario}

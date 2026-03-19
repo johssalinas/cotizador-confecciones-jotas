@@ -222,19 +222,35 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
           >
             <div class="mt-3 grid gap-4 sm:grid-cols-2">
               <form.Field name="cliente">
-                {(field) => (
-                  <TextFieldRoot>
-                    <TextFieldLabel for="cliente">Nombre del Cliente</TextFieldLabel>
-                    <TextField
-                      id="cliente"
-                      value={field().state.value}
-                      placeholder="Ej. IT Comunicaciones"
-                      class="h-10 bg-background/80 text-base"
-                      onInput={(event) => field().handleChange(event.currentTarget.value)}
-                      onBlur={field().handleBlur}
-                    />
-                  </TextFieldRoot>
-                )}
+                {(field) => {
+                  const clienteError = () => (
+                    field().state.value.trim().length < 2
+                      ? 'Ingresa el nombre del cliente.'
+                      : ''
+                  );
+
+                  return (
+                    <TextFieldRoot>
+                      <TextFieldLabel for="cliente">Nombre del Cliente</TextFieldLabel>
+                      <TextField
+                        id="cliente"
+                        value={field().state.value}
+                        placeholder="Ej. IT Comunicaciones"
+                        class={cn(
+                          'h-10 bg-background/80 text-base',
+                          showValidationErrors() && clienteError()
+                            ? 'border-destructive focus-visible:ring-destructive/70'
+                            : '',
+                        )}
+                        onInput={(event) => field().handleChange(event.currentTarget.value)}
+                        onBlur={field().handleBlur}
+                      />
+                      <Show when={showValidationErrors() && clienteError()}>
+                        {(message) => <p class="text-xs text-destructive">{message()}</p>}
+                      </Show>
+                    </TextFieldRoot>
+                  );
+                }}
               </form.Field>
 
               <form.Field name="fecha">
@@ -273,7 +289,12 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
             </Show>
 
             <div class="flex flex-wrap items-center gap-2">
-              <Button type="submit" size="lg" disabled={isSubmitting()}>
+              <Button
+                type="submit"
+                size="lg"
+                disabled={isSubmitting()}
+                class="w-[44vh] max-w-full justify-center sm:w-auto"
+              >
                 <Show when={isSubmitting()} fallback={<Save class="h-4 w-4" />}>
                   <LoaderCircle class="h-4 w-4 animate-spin" />
                 </Show>
