@@ -154,6 +154,15 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
     () => cotizacionActual()?.id ?? null,
   );
 
+  const handleSuccessDialogOpenChange = (open: boolean) => {
+    const wasOpen = isSuccessDialogOpen();
+    setIsSuccessDialogOpen(open);
+
+    if (!open && wasOpen && typeof window !== 'undefined') {
+      window.location.assign('/');
+    }
+  };
+
   return (
     <div class="mx-auto w-full max-w-5xl">
       <Card class="overflow-hidden border-border/80 bg-card/90 shadow-lg backdrop-blur">
@@ -305,7 +314,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
 
           <AlertDialog
             open={isSuccessDialogOpen()}
-            onOpenChange={setIsSuccessDialogOpen}
+            onOpenChange={handleSuccessDialogOpenChange}
           >
             <AlertDialogContent class="w-[min(94vw,56rem)] max-w-4xl border-border/80 bg-card p-0 shadow-2xl">
               <div class="relative overflow-hidden rounded-lg">

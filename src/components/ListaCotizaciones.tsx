@@ -51,6 +51,7 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
   const [activeId, setActiveId] = createSignal<string | null>(null);
   const [deleteTarget, setDeleteTarget] = createSignal<CotizacionListItem | null>(null);
   const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
+  const hasCotizaciones = () => cotizaciones().length > 0;
 
   const refresh = async () => {
     setErrorMessage(null);
@@ -133,7 +134,7 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
     'flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-[0.95rem] font-medium text-destructive transition-colors hover:bg-destructive/10 hover:text-destructive';
 
   const renderActionsMenu = (item: CotizacionListItem, isActive: boolean, showLabel = false) => (
-    <details class="relative">
+    <details class="relative z-30">
       <summary
         class={cn(
           buttonVariants({ variant: 'outline', size: 'sm' }),
@@ -149,7 +150,10 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
         </span>
       </summary>
 
-      <div class="absolute right-0 top-full z-20 mt-2 w-64 rounded-md border border-border bg-card p-2 shadow-lg">
+      <div
+        class="absolute right-0 z-30 w-64 rounded-md border border-border bg-card p-2 shadow-lg"
+        style={{ bottom: 'calc(100% + 0.5rem)' }}
+      >
         <a
           href={`/api/cotizaciones/${item.id}/pdf`}
           target="_blank"
@@ -231,13 +235,18 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
       .join('\n');
   };
 
+  const isDeletingTarget = () => {
+    const target = deleteTarget();
+    return Boolean(target && activeId() === target.id);
+  };
+
   return (
     <Card class="overflow-hidden border-border/80 bg-card/90 shadow-lg backdrop-blur">
       <CardHeader class="border-b border-border/70 bg-linear-to-r from-[hsl(var(--accent)/0.55)] to-transparent sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle class="text-2xl tracking-wide">Cotizaciones Guardadas</CardTitle>
           <CardDescription class="mt-2 leading-relaxed">
-            Historial de documentos con acciones para ver, descargar, editar, duplicar y eliminar.
+            Historial de documentos.
           </CardDescription>
         </div>
 
@@ -258,83 +267,111 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
           )}
         </Show>
 
-        <div class="hidden overflow-x-auto rounded-md border border-border bg-card/70 shadow-sm lg:block">
-          <Table>
-            <TableHeader class="bg-accent/45 [&_th]:font-bold">
-              <TableRow>
-                <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Número</TableHead>
-                <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Cliente</TableHead>
-                <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Productos</TableHead>
-                <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Fecha</TableHead>
-                <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Total</TableHead>
-                <TableHead class="px-4 text-right text-xs uppercase tracking-[0.08em]">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        <Show
+          when={hasCotizaciones()}
+          fallback={(
+            <div class="rounded-md border border-dashed border-primary/30 bg-accent/25 px-5 py-8 text-center">
+              <p class="text-lg font-semibold text-foreground">Aun no hay cotizaciones creadas</p>
+              <p class="mt-2 text-sm text-muted-foreground">
+                Cuando crees la primera cotizacion aparecera aqui con sus acciones de ver,
+                descargar y editar.
+              </p>
+              <div class="mt-5 flex justify-center">
+                <a href="/cotizaciones/nueva" class={cn(buttonVariants({ variant: 'default' }))}>
+                  <Plus class="h-4 w-4" />
+                  Crear primera cotizacion
+                </a>
+              </div>
+            </div>
+          )}
+        >
+          <>
+            <div class="hidden rounded-md border border-border bg-card/70 shadow-sm lg:block">
+              <Table>
+                <TableHeader class="bg-accent/45 [&_th]:font-bold">
+                  <TableRow>
+                    <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Número</TableHead>
+                    <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Cliente</TableHead>
+                    <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Productos</TableHead>
+                    <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Fecha</TableHead>
+                    <TableHead class="px-4 text-xs uppercase tracking-[0.08em]">Total</TableHead>
+                    <TableHead class="px-4 text-right text-xs uppercase tracking-[0.08em]">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <For each={cotizaciones()}>
+                    {(item) => {
+                      const isActive = () => activeId() === item.id;
+
+                      return (
+                        <TableRow>
+                          <TableCell class="px-4 py-5 font-semibold">
+                            {formatNumeroCotizacion(item.numero)}
+                          </TableCell>
+                          <TableCell class="px-4 py-5">{item.cliente}</TableCell>
+                          <TableCell class="px-4 py-5">
+                            <p
+                              title={formatProductosTooltip(item.descripcionesProductos)}
+                              class="max-h-16 max-w-84 overflow-hidden text-sm leading-relaxed [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
+                            >
+                              {formatProductosPreview(item.descripcionesProductos)}
+                            </p>
+                          </TableCell>
+                          <TableCell class="px-4 py-5">{formatFechaLarga(item.fecha)}</TableCell>
+                          <TableCell class="px-4 py-5">{formatMonedaCop(item.total)}</TableCell>
+                          <TableCell class="px-4 py-5">
+                            <div class="flex justify-end">{renderActionsMenu(item, isActive())}</div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    }}
+                  </For>
+                </TableBody>
+              </Table>
+            </div>
+
+            <div class="grid gap-4 lg:hidden">
               <For each={cotizaciones()}>
                 {(item) => {
                   const isActive = () => activeId() === item.id;
 
                   return (
-                    <TableRow>
-                      <TableCell class="px-4 py-5 font-semibold">
-                        {formatNumeroCotizacion(item.numero)}
-                      </TableCell>
-                      <TableCell class="px-4 py-5">{item.cliente}</TableCell>
-                      <TableCell class="px-4 py-5">
+                    <div class="rounded-md border border-border bg-card/80 p-4 shadow-sm">
+                      <div class="mb-3 space-y-1 text-sm">
+                        <div class="flex items-start justify-between gap-3">
+                          <p class="font-semibold text-foreground">{item.cliente}</p>
+                          <p class="w-16 text-right font-semibold text-muted-foreground">
+                            {formatNumeroCotizacion(item.numero)}
+                          </p>
+                        </div>
                         <p
                           title={formatProductosTooltip(item.descripcionesProductos)}
-                          class="max-h-16 max-w-84 overflow-hidden text-sm leading-relaxed [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
+                          class="max-h-12 overflow-hidden text-muted-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
                         >
                           {formatProductosPreview(item.descripcionesProductos)}
                         </p>
-                      </TableCell>
-                      <TableCell class="px-4 py-5">{formatFechaLarga(item.fecha)}</TableCell>
-                      <TableCell class="px-4 py-5">{formatMonedaCop(item.total)}</TableCell>
-                      <TableCell class="px-4 py-5">
-                        <div class="flex justify-end">{renderActionsMenu(item, isActive())}</div>
-                      </TableCell>
-                    </TableRow>
+                        <p class="text-muted-foreground">{formatFechaLarga(item.fecha)}</p>
+                        <p class="font-semibold text-foreground">{formatMonedaCop(item.total)}</p>
+                      </div>
+                      <div class="flex justify-end">
+                        {renderActionsMenu(item, isActive(), true)}
+                      </div>
+                    </div>
                   );
                 }}
               </For>
-            </TableBody>
-          </Table>
-        </div>
+            </div>
+          </>
+        </Show>
 
-        <div class="grid gap-4 lg:hidden">
-          <For each={cotizaciones()}>
-            {(item) => {
-              const isActive = () => activeId() === item.id;
-
-              return (
-                <div class="rounded-md border border-border bg-card/80 p-4 shadow-sm">
-                  <div class="mb-3 space-y-1 text-sm">
-                    <div class="flex items-start justify-between gap-3">
-                      <p class="font-semibold text-foreground">{item.cliente}</p>
-                      <p class="w-16 text-right font-semibold text-muted-foreground">
-                        {formatNumeroCotizacion(item.numero)}
-                      </p>
-                    </div>
-                    <p
-                      title={formatProductosTooltip(item.descripcionesProductos)}
-                      class="max-h-12 overflow-hidden text-muted-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
-                    >
-                      {formatProductosPreview(item.descripcionesProductos)}
-                    </p>
-                    <p class="text-muted-foreground">{formatFechaLarga(item.fecha)}</p>
-                    <p class="font-semibold text-foreground">{formatMonedaCop(item.total)}</p>
-                  </div>
-                  <div class="flex justify-end">
-                    {renderActionsMenu(item, isActive(), true)}
-                  </div>
-                </div>
-              );
-            }}
-          </For>
-        </div>
-
-        <Dialog open={Boolean(deleteTarget())} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <Dialog
+          open={Boolean(deleteTarget())}
+          onOpenChange={(open) => {
+            if (!open && !isDeletingTarget()) {
+              setDeleteTarget(null);
+            }
+          }}
+        >
           <DialogContent class="border-border bg-card">
             <DialogHeader>
               <DialogTitle>
@@ -348,11 +385,32 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Dialog.CloseButton class={cn(buttonVariants({ variant: 'outline' }))}>
+              <Dialog.CloseButton
+                class={cn(buttonVariants({ variant: 'outline' }), 'cursor-pointer')}
+                disabled={isDeletingTarget()}
+              >
                 Cancelar
               </Dialog.CloseButton>
-              <Button variant="destructive" onClick={remove}>
-                Eliminar
+              <Button
+                variant="destructive"
+                class="cursor-pointer"
+                disabled={isDeletingTarget()}
+                onClick={() => {
+                  void remove();
+                }}
+              >
+                <Show
+                  when={isDeletingTarget()}
+                  fallback={(
+                    <>
+                      <Trash2 class="h-4 w-4" />
+                      Eliminar
+                    </>
+                  )}
+                >
+                  <LoaderCircle class="h-4 w-4 animate-spin" />
+                  Eliminando...
+                </Show>
               </Button>
             </DialogFooter>
           </DialogContent>
