@@ -165,14 +165,12 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
           Ver documento
         </a>
         <a
-          href={`/cotizaciones/${item.id}/print`}
-          target="_blank"
-          rel="noreferrer"
+          href={`/api/cotizaciones/${item.id}/pdf?download=1`}
           class={actionItemClass}
           onClick={(event) => closeActionsMenu(event.currentTarget)}
         >
           <Download class="h-4 w-4" />
-          Imprimir documento
+          Descargar PDF
         </a>
         <a
           href={`/cotizaciones/${item.id}`}

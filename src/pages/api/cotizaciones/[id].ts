@@ -4,12 +4,18 @@ import { z } from 'zod';
 import {
   deleteCotizacion,
   getCotizacionById,
+  setCotizacionPdfUrl,
   updateCotizacionData,
 } from '@/lib/cotizaciones/repository';
 import { cotizacionInputSchema } from '@/lib/cotizaciones/types';
 import { jsonResponse, parseJsonRequest } from '@/lib/http';
+import { buildCotizacionPdf } from '@/lib/pdf/template';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
-import { removePdfByPublicUrl } from '@/lib/supabase/storage';
+import {
+  buildPdfStoragePath,
+  removePdfByPublicUrl,
+  uploadPdf,
+} from '@/lib/supabase/storage';
 
 export const GET: APIRoute = async ({ params }) => {
   const id = params.id;
@@ -68,7 +74,23 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
     const updated = await updateCotizacionData(supabase, id, parsed.data);
 
-    return jsonResponse({ data: updated }, { status: 200 });
+    const pdfBytes = await buildCotizacionPdf({
+      numero: updated.numero,
+      cliente: parsed.data.cliente,
+      fecha: parsed.data.fecha,
+      productos: parsed.data.productos,
+    });
+
+    const storagePath = buildPdfStoragePath(updated.numero, updated.cliente, updated.fecha);
+    const pdfUrl = await uploadPdf(supabase, storagePath, pdfBytes);
+
+    const saved = await setCotizacionPdfUrl(supabase, updated.id, pdfUrl);
+
+    if (previous.pdfUrl && previous.pdfUrl !== saved.pdfUrl) {
+      await removePdfByPublicUrl(supabase, previous.pdfUrl).catch(() => undefined);
+    }
+
+    return jsonResponse({ data: saved }, { status: 200 });
   } catch (error) {
     return jsonResponse(
       {

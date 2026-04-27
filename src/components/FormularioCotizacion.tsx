@@ -195,16 +195,14 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                     Ver documento
                   </a>
                   <a
-                    href={`/cotizaciones/${id()}/print`}
-                    target="_blank"
-                    rel="noreferrer"
+                    href={`/api/cotizaciones/${id()}/pdf?download=1`}
                     class={cn(
                       buttonVariants({ variant: 'outline', size: 'sm' }),
                       'gap-2 border-primary/35 bg-background/80',
                     )}
                   >
                     <Download class="h-4 w-4" />
-                    Imprimir documento
+                    Descargar PDF
                   </a>
                 </div>
               )}
@@ -362,16 +360,14 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                             Ver documento
                           </a>
                           <a
-                            href={`/cotizaciones/${id()}/print`}
-                            target="_blank"
-                            rel="noreferrer"
+                            href={`/api/cotizaciones/${id()}/pdf?download=1`}
                             class={cn(
                               buttonVariants({ variant: 'outline', size: 'lg' }),
                               'gap-2',
                             )}
                           >
                             <Download class="h-4 w-4" />
-                            Imprimir documento
+                            Descargar PDF
                           </a>
                         </div>
                       )}
