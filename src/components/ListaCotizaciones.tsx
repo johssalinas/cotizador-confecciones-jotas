@@ -155,22 +155,24 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
         style={{ bottom: 'calc(100% + 0.5rem)' }}
       >
         <a
-          href={`/api/cotizaciones/${item.id}/pdf`}
+          href={`/cotizaciones/${item.id}/print`}
           target="_blank"
           rel="noreferrer"
           class={actionItemClass}
           onClick={(event) => closeActionsMenu(event.currentTarget)}
         >
           <Eye class="h-4 w-4" />
-          Ver documento PDF
+          Ver documento
         </a>
         <a
-          href={`/api/cotizaciones/${item.id}/pdf?download=1`}
+          href={`/cotizaciones/${item.id}/print`}
+          target="_blank"
+          rel="noreferrer"
           class={actionItemClass}
           onClick={(event) => closeActionsMenu(event.currentTarget)}
         >
           <Download class="h-4 w-4" />
-          Descargar documento PDF
+          Imprimir documento
         </a>
         <a
           href={`/cotizaciones/${item.id}`}

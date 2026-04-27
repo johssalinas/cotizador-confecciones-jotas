@@ -183,7 +183,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
               {(id) => (
                 <div class="flex flex-wrap items-center justify-end gap-2">
                   <a
-                    href={`/api/cotizaciones/${id()}/pdf`}
+                    href={`/cotizaciones/${id()}/print`}
                     target="_blank"
                     rel="noreferrer"
                     class={cn(
@@ -192,17 +192,19 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                     )}
                   >
                     <Eye class="h-4 w-4" />
-                    Ver PDF
+                    Ver documento
                   </a>
                   <a
-                    href={`/api/cotizaciones/${id()}/pdf?download=1`}
+                    href={`/cotizaciones/${id()}/print`}
+                    target="_blank"
+                    rel="noreferrer"
                     class={cn(
                       buttonVariants({ variant: 'outline', size: 'sm' }),
                       'gap-2 border-primary/35 bg-background/80',
                     )}
                   >
                     <Download class="h-4 w-4" />
-                    Descargar PDF
+                    Imprimir documento
                   </a>
                 </div>
               )}
@@ -217,7 +219,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
               ? `Número asignado: ${formatNumeroCotizacion(numeroVisible() ?? 0)}`
               : 'El numero se asigna automaticamente al guardar.'}
             {' '}
-            El PDF se genera unicamente al guardar la cotizacion.
+            El documento para imprimir se habilitará unicamente al guardar la cotizacion.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -351,23 +353,25 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                       {(id) => (
                         <div class="flex flex-wrap gap-3">
                           <a
-                            href={`/api/cotizaciones/${id()}/pdf`}
+                            href={`/cotizaciones/${id()}/print`}
                             target="_blank"
                             rel="noreferrer"
                             class={cn(buttonVariants({ size: 'lg' }), 'gap-2')}
                           >
                             <Eye class="h-4 w-4" />
-                            Ver PDF
+                            Ver documento
                           </a>
                           <a
-                            href={`/api/cotizaciones/${id()}/pdf?download=1`}
+                            href={`/cotizaciones/${id()}/print`}
+                            target="_blank"
+                            rel="noreferrer"
                             class={cn(
                               buttonVariants({ variant: 'outline', size: 'lg' }),
                               'gap-2',
                             )}
                           >
                             <Download class="h-4 w-4" />
-                            Descargar PDF
+                            Imprimir documento
                           </a>
                         </div>
                       )}

@@ -1,0 +1,298 @@
+---
+import '@/styles/global.css';
+
+import {
+  calcularSubtotal,
+  calcularTotal,
+  formatFechaLarga,
+  formatMonedaCop,
+  formatNumeroCotizacion,
+} from '@/lib/cotizaciones/calculations';
+import { getCotizacionById } from '@/lib/cotizaciones/repository';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
+
+const id = Astro.params.id;
+
+if (!id) {
+  return new Response('Cotización no encontrada', { status: 404 });
+}
+
+const supabase = getSupabaseServerClient();
+const data = await getCotizacionById(supabase, id);
+
+if (!data) {
+  return new Response('Cotización no encontrada', { status: 404 });
+}
+
+const total = calcularTotal(data.productos);
+const firmante = 'Luz Elena López Muñoz'; // Podría venir de la bd en el futuro
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cotización {formatNumeroCotizacion(data.numero)} - Confecciones Jotas</title>
+    
+    <style>
+      @page {
+        margin: 0;
+        size: A4;
+      }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f3f4f6;
+        font-family: 'Times New Roman', Times, serif;
+        color: #1a1a1a;
+      }
+      
+      .a4-page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 2rem auto;
+        padding: 20mm;
+        background-color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        position: relative;
+        box-sizing: border-box;
+      }
+
+      /* Watermark */
+      .a4-page::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 15rem; /* Ajustar de acuerdo al logo */
+        height: 15rem;
+        background-image: url('/assets/logo.svg');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        opacity: 0.08;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .content {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        min-height: calc(297mm - 40mm);
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+      }
+
+      .logo-container {
+        width: 182px;
+      }
+
+      .logo-container img {
+        width: 100%;
+        height: auto;
+      }
+
+      .header-info {
+        text-align: right;
+        font-size: 14px;
+        margin-top: 1rem;
+      }
+      
+      .header-info h2 {
+        font-size: 16px;
+        margin: 0;
+        margin-top: 0.5rem;
+      }
+
+      h1.maintitle {
+        font-size: 20px;
+        margin: 0 0 1rem 0;
+        text-transform: uppercase;
+      }
+
+      .greeting {
+        font-size: 16px;
+        margin-bottom: 2rem;
+      }
+
+      .products-table-label {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+        font-size: 14px;
+        table-layout: fixed;
+      }
+
+      th, td {
+        border: 1px solid #333;
+        padding: 8px 12px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+
+      th {
+        background-color: #f9fafb;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      td.desc {
+        font-style: italic;
+        width: 45%;
+      }
+      
+      td.center { 
+        text-align: center;
+        width: 15%;
+      }
+      td.right { 
+        text-align: right; 
+        width: 20%;
+      }
+
+      .total-row td {
+        background-color: #f9fafb;
+        font-weight: bold;
+      }
+
+      .footer-spacer {
+        flex-grow: 1;
+      }
+
+      footer {
+        font-size: 16px;
+        margin-top: 2rem;
+        page-break-inside: avoid;
+      }
+      
+      footer p {
+        margin: 0.25rem 0;
+      }
+
+      .signature-area {
+        margin-top: 3.5rem;
+        width: 250px;
+        border-top: 1px solid #4a4a4a;
+        padding-top: 5px;
+      }
+
+      .signature-area .signer {
+        font-weight: bold;
+      }
+
+      .signature-area .company {
+        font-style: italic;
+        font-weight: bold;
+        margin-top: 0.5rem;
+      }
+      
+      .signature-area .info {
+        font-style: italic;
+        font-weight: bold;
+      }
+
+      @media print {
+        body { background-color: transparent; }
+        .a4-page {
+          margin: 0;
+          padding: 20mm;
+          box-shadow: none;
+          min-height: 100vh;
+        }
+        /* Hint the browser to print backgrounds */
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Script para auto-invocar la impresión si se accede directo -->
+    <script>
+      window.onload = () => {
+        setTimeout(() => { window.print(); }, 300);
+      };
+    </script>
+    
+    <div class="a4-page">
+      <div class="content">
+        <header>
+          <div class="logo-container">
+            <img src="/assets/logo.svg" alt="Confecciones Jotas" onerror="this.onerror=null;this.src='/assets/logo.png';" />
+          </div>
+          <div class="header-info">
+            <p>{formatFechaLarga(data.fecha)}</p>
+            <h2>Número de Cotización: {formatNumeroCotizacion(data.numero)}</h2>
+          </div>
+        </header>
+
+        <h1 class="maintitle">COTIZACIÓN</h1>
+
+        <div class="greeting">
+          Estimados <strong>{data.cliente},</strong>
+        </div>
+
+        <div class="products-table-label">Detalle de Productos:</div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Descripcion del Producto</th>
+              <th>Cantidad</th>
+              <th>Precio Unitario</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.productos.map((producto) => (
+              <tr>
+                <td class="desc">{producto.descripcion}</td>
+                <td class="center">{producto.cantidad}</td>
+                <td class="right">{formatMonedaCop(producto.precioUnitario)}</td>
+                <td class="right">{formatMonedaCop(calcularSubtotal(producto))}</td>
+              </tr>
+            ))}
+            <tr class="total-row">
+              <td colspan="3" class="right">Total</td>
+              <td class="right">{formatMonedaCop(total)}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Espaciador flexible para empujar el footer hacia abajo -->
+        <div class="footer-spacer"></div>
+
+        <footer>
+          <p>Agradecemos su interes en nuestros servicios y quedamos atentos a cualquier inquietud.</p>
+          <br>
+          <p>Atentamente,</p>
+          
+          <div class="signature-area">
+            <p class="signer">{firmante}</p>
+            <p class="company">Confecciones Jotas</p>
+            <p class="info">Dirección: Calle 24H #10A-23</p>
+            <p class="info">Telefono: 3208472821</p>
+            <p class="info">Instagram: @confeccionesjotas</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>

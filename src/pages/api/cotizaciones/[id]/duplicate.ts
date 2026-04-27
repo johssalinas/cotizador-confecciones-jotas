@@ -3,12 +3,9 @@ import type { APIRoute } from 'astro';
 import {
   createCotizacionDraft,
   getCotizacionById,
-  setCotizacionPdfUrl,
 } from '@/lib/cotizaciones/repository';
 import { jsonResponse } from '@/lib/http';
-import { buildCotizacionPdf } from '@/lib/pdf/template';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
-import { buildPdfStoragePath, uploadPdf } from '@/lib/supabase/storage';
 
 export const POST: APIRoute = async ({ params }) => {
   const id = params.id;
@@ -31,23 +28,7 @@ export const POST: APIRoute = async ({ params }) => {
       productos: source.productos,
     });
 
-    const pdfBytes = await buildCotizacionPdf({
-      numero: duplicate.numero,
-      cliente: duplicate.cliente,
-      fecha: duplicate.fecha,
-      productos: duplicate.productos,
-    });
-
-    const storagePath = buildPdfStoragePath(
-      duplicate.numero,
-      duplicate.cliente,
-      duplicate.fecha,
-    );
-    const pdfUrl = await uploadPdf(supabase, storagePath, pdfBytes);
-
-    const saved = await setCotizacionPdfUrl(supabase, duplicate.id, pdfUrl);
-
-    return jsonResponse({ data: saved }, { status: 201 });
+    return jsonResponse({ data: duplicate }, { status: 201 });
   } catch (error) {
     return jsonResponse(
       {
