@@ -312,7 +312,7 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
                           <TableCell class="px-4 py-5">
                             <p
                               title={formatProductosTooltip(item.descripcionesProductos)}
-                              class="max-h-16 max-w-84 overflow-hidden text-sm leading-relaxed [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
+                                class="max-h-16 max-w-84 overflow-hidden break-all text-sm leading-relaxed [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
                             >
                               {formatProductosPreview(item.descripcionesProductos)}
                             </p>
@@ -339,14 +339,14 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
                     <div class="rounded-md border border-border bg-card/80 p-4 shadow-sm">
                       <div class="mb-3 space-y-1 text-sm">
                         <div class="flex items-start justify-between gap-3">
-                          <p class="font-semibold text-foreground">{item.cliente}</p>
-                          <p class="w-16 text-right font-semibold text-muted-foreground">
-                            {formatNumeroCotizacion(item.numero)}
-                          </p>
-                        </div>
-                        <p
-                          title={formatProductosTooltip(item.descripcionesProductos)}
-                          class="max-h-12 overflow-hidden text-muted-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
+                            <p class="font-semibold text-foreground break-words">{item.cliente}</p>
+                            <p class="w-16 shrink-0 text-right font-semibold text-muted-foreground">
+                              {formatNumeroCotizacion(item.numero)}
+                            </p>
+                          </div>
+                          <p
+                            title={formatProductosTooltip(item.descripcionesProductos)}
+                            class="max-h-12 overflow-hidden break-all text-muted-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
                         >
                           {formatProductosPreview(item.descripcionesProductos)}
                         </p>
