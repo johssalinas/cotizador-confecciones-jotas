@@ -7,10 +7,14 @@ import solidJs from '@astrojs/solid-js';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 
+import react from '@astrojs/react';
+
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  integrations: [solidJs()],
+  integrations: [solidJs({
+    exclude: ['**/pdf/*'],
+  }), react()],
   adapter: vercel(),
   compressHTML: true,
 
