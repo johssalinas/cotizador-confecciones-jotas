@@ -26,8 +26,20 @@ export interface CotizacionPdfData {
   firmante?: string;
 }
 
+const TABLE_BORDER_COLOR = '#000000';
+const TABLE_BORDER_INNER = '1pt';
+const TABLE_BORDER_OUTER = '2pt';
+
 const styles = StyleSheet.create({
-  page: { padding: 55, fontFamily: 'Times-Roman', fontSize: 14, color: '#131313' },
+  page: {
+    paddingTop: 5,
+    paddingRight: 55,
+    paddingBottom: 55,
+    paddingLeft: 55,
+    fontFamily: 'Times-Roman',
+    fontSize: 14,
+    color: '#131313',
+  },
   watermark: {
     position: 'absolute',
     top: '30%',
@@ -38,7 +50,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   headerLogo: {
     width: 182,
@@ -67,42 +79,56 @@ const styles = StyleSheet.create({
   table: {
     width: '100%',
     marginBottom: 40,
+    borderRadius: 0,
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#f8f8f8',
-    border: '1pt solid #262626',
-    borderBottomWidth: 0,
+    backgroundColor: '#ffffff',
+    borderColor: TABLE_BORDER_COLOR,
+    borderStyle: 'solid',
+    borderTopWidth: TABLE_BORDER_OUTER,
+    borderLeftWidth: TABLE_BORDER_OUTER,
+    borderRightWidth: TABLE_BORDER_OUTER,
+    borderBottomWidth: TABLE_BORDER_OUTER,
+    borderRadius: 0,
   },
   tableRow: {
     flexDirection: 'row',
-    border: '1pt solid #333333',
+    borderColor: TABLE_BORDER_COLOR,
+    borderStyle: 'solid',
+    borderLeftWidth: TABLE_BORDER_OUTER,
+    borderRightWidth: TABLE_BORDER_OUTER,
+    borderTopWidth: TABLE_BORDER_INNER,
     borderBottomWidth: 0,
+    borderRadius: 0,
+  },
+  tableRowFirst: {
+    borderTopWidth: 0,
   },
   tableRowLast: {
-    borderBottomWidth: '1pt',
+    borderBottomWidth: TABLE_BORDER_OUTER,
   },
   colDesc: {
     width: '45%',
     padding: 8,
-    borderRight: '1pt solid #333333',
+    borderRight: `${TABLE_BORDER_INNER} solid ${TABLE_BORDER_COLOR}`,
   },
   colTalla: {
     width: '10%',
     padding: 8,
-    borderRight: '1pt solid #333333',
+    borderRight: `${TABLE_BORDER_INNER} solid ${TABLE_BORDER_COLOR}`,
     textAlign: 'center',
   },
   colCant: {
     width: '15%',
     padding: 8,
-    borderRight: '1pt solid #333333',
+    borderRight: `${TABLE_BORDER_INNER} solid ${TABLE_BORDER_COLOR}`,
     textAlign: 'center',
   },
   colPrecio: {
     width: '15%',
     padding: 8,
-    borderRight: '1pt solid #333333',
+    borderRight: `${TABLE_BORDER_INNER} solid ${TABLE_BORDER_COLOR}`,
     textAlign: 'right',
   },
   colTotal: {
@@ -124,13 +150,16 @@ const styles = StyleSheet.create({
   },
   totalRow: {
     flexDirection: 'row',
-    backgroundColor: '#fafafa',
-    border: '1pt solid #333333',
+    backgroundColor: '#ffffff',
+    borderColor: TABLE_BORDER_COLOR,
+    borderStyle: 'solid',
+    borderWidth: TABLE_BORDER_OUTER,
+    borderRadius: 0,
   },
   totalColTitle: {
     width: '85%',
     padding: 8,
-    borderRight: '1pt solid #333333',
+    borderRight: `${TABLE_BORDER_OUTER} solid ${TABLE_BORDER_COLOR}`,
     textAlign: 'right',
     fontFamily: 'Times-Bold',
     fontSize: 12,
@@ -229,11 +258,16 @@ const CotizacionDocument = ({
           </View>
 
           {productos.map((producto, i) => {
+            const isFirst = i === 0;
             const isLast = i === productos.length - 1;
             return (
               <View
                 key={i}
-                style={[styles.tableRow, isLast ? styles.tableRowLast : {}]}
+                style={[
+                  styles.tableRow,
+                  isFirst ? styles.tableRowFirst : {},
+                  isLast ? styles.tableRowLast : {},
+                ]}
               >
                 <View style={styles.colDesc}>
                   <Text style={styles.tableCellItalic}>{producto.descripcion}</Text>
