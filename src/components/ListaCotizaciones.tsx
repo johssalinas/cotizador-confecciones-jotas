@@ -155,7 +155,7 @@ export function ListaCotizaciones(props: ListaCotizacionesProps) {
         style={{ bottom: 'calc(100% + 0.5rem)' }}
       >
         <a
-          href={`/cotizaciones/${item.id}/print`}
+          href={`/api/cotizaciones/${item.id}/pdf`}
           target="_blank"
           rel="noreferrer"
           class={actionItemClass}

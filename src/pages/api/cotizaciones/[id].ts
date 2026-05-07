@@ -9,13 +9,9 @@ import {
 } from '@/lib/cotizaciones/repository';
 import { cotizacionInputSchema } from '@/lib/cotizaciones/types';
 import { jsonResponse, parseJsonRequest } from '@/lib/http';
-import { buildCotizacionPdf } from '@/lib/pdf/template';
+import { uploadValidatedCotizacionPdf } from '@/lib/pdf/workflow';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
-import {
-  buildPdfStoragePath,
-  removePdfByPublicUrl,
-  uploadPdf,
-} from '@/lib/supabase/storage';
+import { removePdfByPublicUrl } from '@/lib/supabase/storage';
 
 export const GET: APIRoute = async ({ params }) => {
   const id = params.id;
@@ -74,15 +70,12 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
     const updated = await updateCotizacionData(supabase, id, parsed.data);
 
-    const pdfBytes = await buildCotizacionPdf({
+    const pdfUrl = await uploadValidatedCotizacionPdf(supabase, {
       numero: updated.numero,
       cliente: parsed.data.cliente,
       fecha: parsed.data.fecha,
       productos: parsed.data.productos,
     });
-
-    const storagePath = buildPdfStoragePath(updated.numero, updated.cliente, updated.fecha);
-    const pdfUrl = await uploadPdf(supabase, storagePath, pdfBytes);
 
     const saved = await setCotizacionPdfUrl(supabase, updated.id, pdfUrl);
 

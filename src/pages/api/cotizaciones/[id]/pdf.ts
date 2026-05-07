@@ -1,10 +1,11 @@
 import type { APIRoute } from 'astro';
 
+import { logCotizacionAudit, resolveAuditActor } from '@/lib/cotizaciones/audit';
 import { getCotizacionById } from '@/lib/cotizaciones/repository';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { buildPdfDownloadName, downloadPdfByPublicUrl } from '@/lib/supabase/storage';
 
-export const GET: APIRoute = async ({ params, url }) => {
+export const GET: APIRoute = async ({ params, request, url }) => {
   const id = params.id;
 
   if (!id) {
@@ -22,8 +23,17 @@ export const GET: APIRoute = async ({ params, url }) => {
     const bytes = await downloadPdfByPublicUrl(supabase, cotizacion.pdfUrl);
     const forceDownload = url.searchParams.get('download') === '1';
     const fileName = buildPdfDownloadName(cotizacion.cliente, cotizacion.numero);
+    const actor = resolveAuditActor(request);
 
     const body = new Uint8Array(bytes);
+
+    await logCotizacionAudit(supabase, {
+      cotizacionId: cotizacion.id,
+      action: forceDownload ? 'download' : 'view',
+      usuario: actor.usuario,
+      ip: actor.ip,
+      userAgent: actor.userAgent,
+    });
 
     return new Response(body, {
       status: 200,
@@ -37,7 +47,9 @@ export const GET: APIRoute = async ({ params, url }) => {
     });
   } catch (error) {
     return new Response(
-      error instanceof Error ? error.message : 'No fue posible descargar el PDF.',
+      error instanceof Error
+        ? `No fue posible recuperar el PDF almacenado: ${error.message}`
+        : 'No fue posible recuperar el PDF almacenado.',
       { status: 500 },
     );
   }

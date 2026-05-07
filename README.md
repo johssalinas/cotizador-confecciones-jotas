@@ -21,6 +21,7 @@ Aplicacion web minimalista y rapida para generar y administrar cotizaciones en u
 - Eliminar cotizacion
 - Ver PDF en navegador
 - Descargar PDF
+- Auditoría de visualizaciones y descargas
 - Número de cotizacion autoincrementable generado en DB
 
 ## Estructura principal
@@ -75,6 +76,7 @@ cp .env.example .env.local
 1. Ejecuta la migracion SQL en Supabase SQL Editor:
 
 - `supabase/migrations/20260319_init_cotizaciones.sql`
+- `supabase/migrations/20260507_add_cotizaciones_auditoria.sql`
 
 1. Levanta el entorno local:
 

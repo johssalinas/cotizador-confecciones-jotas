@@ -183,7 +183,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
               {(id) => (
                 <div class="flex flex-wrap items-center justify-end gap-2">
                   <a
-                    href={`/cotizaciones/${id()}/print`}
+                    href={`/api/cotizaciones/${id()}/pdf`}
                     target="_blank"
                     rel="noreferrer"
                     class={cn(
@@ -351,7 +351,7 @@ export function FormularioCotizacion(props: FormularioCotizacionProps) {
                       {(id) => (
                         <div class="flex flex-wrap gap-3">
                           <a
-                            href={`/cotizaciones/${id()}/print`}
+                            href={`/api/cotizaciones/${id()}/pdf`}
                             target="_blank"
                             rel="noreferrer"
                             class={cn(buttonVariants({ size: 'lg' }), 'gap-2')}
