@@ -152,7 +152,7 @@ const firmante = 'Luz Elena López Muñoz'; // Podría venir de la bd en el futu
 
       td.desc {
         font-style: italic;
-        width: 45%;
+        width: 35%;
       }
       
       td.center { 
@@ -161,7 +161,7 @@ const firmante = 'Luz Elena López Muñoz'; // Podría venir de la bd en el futu
       }
       td.right { 
         text-align: right; 
-        width: 20%;
+        width: 15%;
       }
 
       .total-row td {
@@ -253,6 +253,7 @@ const firmante = 'Luz Elena López Muñoz'; // Podría venir de la bd en el futu
           <thead>
             <tr>
               <th>Descripcion del Producto</th>
+              <th>Talla</th>
               <th>Cantidad</th>
               <th>Precio Unitario</th>
               <th>Subtotal</th>
@@ -262,13 +263,14 @@ const firmante = 'Luz Elena López Muñoz'; // Podría venir de la bd en el futu
             {data.productos.map((producto) => (
               <tr>
                 <td class="desc">{producto.descripcion}</td>
+                <td class="center">{producto.talla || '-'}</td>
                 <td class="center">{producto.cantidad}</td>
                 <td class="right">{formatMonedaCop(producto.precioUnitario)}</td>
                 <td class="right">{formatMonedaCop(calcularSubtotal(producto))}</td>
               </tr>
             ))}
             <tr class="total-row">
-              <td colspan="3" class="right">Total</td>
+              <td colspan="4" class="right">Total</td>
               <td class="right">{formatMonedaCop(total)}</td>
             </tr>
           </tbody>

@@ -45,6 +45,8 @@ interface CotizacionPdfData {
 interface TableColumns {
   descripcionX: number;
   descripcionWidth: number;
+  tallaX: number;
+  tallaWidth: number;
   cantidadX: number;
   cantidadWidth: number;
   precioX: number;
@@ -192,13 +194,15 @@ function drawTableHeader(
   const tableRight = A4_WIDTH - MARGIN_X;
   const columns: TableColumns = {
     descripcionX: tableLeft,
-    descripcionWidth: 245,
-    cantidadX: tableLeft + 245,
+    descripcionWidth: 205,
+    tallaX: tableLeft + 205,
+    tallaWidth: 40,
+    cantidadX: tableLeft + 205 + 40,
     cantidadWidth: 70,
-    precioX: tableLeft + 245 + 70,
+    precioX: tableLeft + 205 + 40 + 70,
     precioWidth: 95,
-    totalX: tableLeft + 245 + 70 + 95,
-    totalWidth: tableRight - (tableLeft + 245 + 70 + 95),
+    totalX: tableLeft + 205 + 40 + 70 + 95,
+    totalWidth: tableRight - (tableLeft + 205 + 40 + 70 + 95),
     right: tableRight,
   };
 
@@ -218,6 +222,15 @@ function drawTableHeader(
     font: boldFont,
     size: FONT_SIZE_TABLE,
   });
+
+  drawCenteredText(
+    page,
+    'Talla',
+    columns.tallaX + columns.tallaWidth / 2,
+    y + 10,
+    boldFont,
+    FONT_SIZE_TABLE,
+  );
 
   drawCenteredText(
     page,
@@ -245,6 +258,13 @@ function drawTableHeader(
     boldFont,
     FONT_SIZE_TABLE,
   );
+
+  page.drawLine({
+    start: { x: columns.tallaX, y },
+    end: { x: columns.tallaX, y: y + ROW_HEIGHT },
+    thickness: 1,
+    color: rgb(0.2, 0.2, 0.2),
+  });
 
   page.drawLine({
     start: { x: columns.cantidadX, y },
@@ -341,6 +361,15 @@ export async function buildCotizacionPdf(data: CotizacionPdfData): Promise<Uint8
 
     drawCenteredText(
       page,
+      producto.talla || '-',
+      columns.tallaX + columns.tallaWidth / 2,
+      currentY + 10,
+      regularFont,
+      FONT_SIZE_TABLE,
+    );
+
+    drawCenteredText(
+      page,
       String(producto.cantidad),
       columns.cantidadX + columns.cantidadWidth / 2,
       currentY + 10,
@@ -365,6 +394,13 @@ export async function buildCotizacionPdf(data: CotizacionPdfData): Promise<Uint8
       regularFont,
       FONT_SIZE_TABLE,
     );
+
+    page.drawLine({
+      start: { x: columns.tallaX, y: currentY },
+      end: { x: columns.tallaX, y: currentY + ROW_HEIGHT },
+      thickness: 1,
+      color: rgb(0.2, 0.2, 0.2),
+    });
 
     page.drawLine({
       start: { x: columns.cantidadX, y: currentY },

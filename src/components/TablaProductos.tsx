@@ -28,6 +28,7 @@ interface TablaProductosProps {
 function createBlankRow(): ProductoInput {
   return {
     descripcion: '',
+    talla: '',
     cantidad: 1,
     precioUnitario: 0,
   };
@@ -95,6 +96,7 @@ export function TablaProductos(props: TablaProductosProps) {
           <TableHeader class="bg-accent/45">
             <TableRow>
               <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">Descripcion del Producto</TableHead>
+              <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">Talla</TableHead>
               <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">Cantidad</TableHead>
               <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">Precio Unitario</TableHead>
               <TableHead class="text-xs font-bold uppercase tracking-[0.08em]">SubTotal</TableHead>
@@ -128,6 +130,22 @@ export function TablaProductos(props: TablaProductosProps) {
                           {rowErrors()[rowIndex]?.descripcion}
                         </p>
                       )}
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <div class="space-y-1">
+                      <input
+                        value={producto().talla ?? ''}
+                        placeholder="Ej. M"
+                        class={cn(inputBaseClass, 'bg-background/80')}
+                        disabled={props.disabled}
+                        onInput={(event) => {
+                          updateRow(rowIndex, {
+                            talla: event.currentTarget.value,
+                          });
+                        }}
+                      />
                     </div>
                   </TableCell>
 
@@ -218,7 +236,7 @@ export function TablaProductos(props: TablaProductosProps) {
               )}
             </Index>
             <TableRow>
-              <TableCell class="font-semibold" colSpan={3}>
+              <TableCell class="font-semibold" colSpan={4}>
                 Total General
               </TableCell>
               <TableCell class="font-semibold">{totalGeneral()}</TableCell>
@@ -274,6 +292,23 @@ export function TablaProductos(props: TablaProductosProps) {
                       {rowErrors()[rowIndex]?.descripcion}
                     </p>
                   )}
+                </div>
+
+                <div class="space-y-1">
+                  <p class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                    Talla
+                  </p>
+                  <input
+                    value={producto().talla ?? ''}
+                    placeholder="Ej. S, M, L..."
+                    class={cn(inputBaseClass, 'bg-background/80')}
+                    disabled={props.disabled}
+                    onInput={(event) => {
+                      updateRow(rowIndex, {
+                        talla: event.currentTarget.value,
+                      });
+                    }}
+                  />
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">

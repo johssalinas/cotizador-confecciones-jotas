@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const productoSchema = z.object({
   descripcion: z.string().trim().min(2, 'Ingresa una descripcion valida.'),
+  talla: z.string().trim().optional(),
   cantidad: z.coerce.number().int().min(1, 'La cantidad debe ser mayor a 0.'),
   precioUnitario: z.coerce.number().min(0, 'El precio no puede ser negativo.'),
 });
